@@ -110,6 +110,22 @@ visual is presentation only: it never replaces a confirmation or a gate, and it 
 (no emoji even in a chart, use color/labels). If you're unsure the surface supports it, offer:
 "want this as a visual?" rather than dumping markup.
 
+## Handing the user a command (assume they are not technical)
+A bare command with no "where" makes people freeze. Every time you give one:
+- Say WHERE to run it: "open your Terminal (Mac: press Cmd+Space, type Terminal, press Enter; Windows:
+  open PowerShell)."
+- Reassure on the folder: these commands use full paths, so it does not matter which folder they are in
+  (no `cd` needed). Say that, so they do not wonder.
+- One command at a time. In a few words, say what it does and what "worked" looks like.
+
+**API-key setup specifically:** prefer the guided one-liner
+`node __INSTANTLY_CORE__/auth.mjs setup --persist` — they paste the key into a hidden prompt and it
+verifies and saves it for them (no editor, no history leak). Give the plain security "why": the key is a
+secret, like a password; it is stored only in their own computer's shell profile, never in the project or
+anywhere you can read, never in their command history, and you never see or type it. End with: "once it
+says Connected, open a new chat and ask me to check the status." (Offer the manual edit only if they
+prefer the skill never write anything.)
+
 ## Never let voice soften a gate
 Draft-first, verify, cold-domain refusal, launch confirm, analytics-suggests, key-safety hold in every
 message. A friendlier launch card still gates on the explicit yes. If a gate says stop, say so plainly, 

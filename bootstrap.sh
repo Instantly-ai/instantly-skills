@@ -12,9 +12,9 @@ REPO="${INSTANTLY_SKILLS_REPO:-https://github.com/Instantly-ai/instantly-skills.
 SRC="${INSTANTLY_SKILLS_SRC:-$HOME/.instantly-skills-src}"
 
 die(){ printf 'bootstrap: %s\n' "$*" >&2; exit 1; }
-command -v git  >/dev/null 2>&1 || die "git is required."
-command -v node >/dev/null 2>&1 || die "Node.js 18+ is required (https://nodejs.org)."
-[ "$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null)" -ge 18 ] 2>/dev/null || die "Node 18+ required (found $(node -v 2>/dev/null))."
+command -v git  >/dev/null 2>&1 || die "git is required. Install it, or ask Claude to install this skill for you (it'll set up prerequisites)."
+command -v node >/dev/null 2>&1 || die "Node 18+ is required. Install it without admin via nvm (github.com/nvm-sh/nvm, then 'nvm install --lts'), or ask Claude to install it for you."
+[ "$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null)" -ge 18 ] 2>/dev/null || die "Node 18+ required (found $(node -v 2>/dev/null)). Upgrade via nvm ('nvm install --lts'), or ask Claude."
 
 if [ -d "$SRC/.git" ]; then
   echo "Updating $SRC"

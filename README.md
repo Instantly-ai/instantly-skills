@@ -59,6 +59,24 @@ sell, your ICP, personas, offer, voice, and booking links. So the emails are spe
 also learns your tone from your edits and stops re-asking what you've already decided.
 
 ## Install (about 60 seconds)
+
+**Easiest — ask Claude to do it (no terminal knowledge needed).** Open Claude Code in any new folder,
+start a chat, and paste this. It'll check for Node (and install it for you if it's missing, no admin
+rights), install the skill, and walk you through your key. Approve the steps it asks about.
+```text
+Install the Instantly GTM skill for me, and explain each step as you go.
+
+1. Check I have Node 18+ (node --version). If not, install it for me without admin rights using nvm
+   (look up the current install command at github.com/nvm-sh/nvm), then the latest LTS Node.
+2. Install the skill by running:
+   curl -fsSL https://raw.githubusercontent.com/Instantly-ai/instantly-skills/main/bootstrap.sh | bash
+3. Then help me set my Instantly API key with:
+   node ~/.instantly-gtm/core/auth.mjs setup --persist
+   I'll paste the key into the hidden prompt myself — don't ask me to share the key with you.
+4. When it's done, tell me to open a new chat to start using it.
+```
+
+**Or do it yourself.**
 One line (macOS / Linux):
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Instantly-ai/instantly-skills/main/bootstrap.sh | bash                    # installs instantly-gtm + shared core
@@ -70,13 +88,16 @@ git clone https://github.com/Instantly-ai/instantly-skills.git && cd instantly-s
 ./install.sh instantly-gtm          # or: --list (see all) · no args (picker) · --all
 # Windows: powershell -ExecutionPolicy Bypass -File .\install.ps1 instantly-gtm
 ```
-Then set your key:
+Then set your key. In your Terminal (Mac: Cmd+Space, type Terminal; Windows: PowerShell) — runs from any folder:
 ```bash
-node ~/.instantly-gtm/core/auth.mjs setup   # opens the API-keys page and shows how to set your key
+node ~/.instantly-gtm/core/auth.mjs setup --persist   # opens the keys page; paste your key when asked (hidden)
 ```
-That's the whole setup. No MCP server to register. Full walkthrough: [docs/quickstart.md](docs/quickstart.md).
+It verifies the key and saves it for you. Your key stays only in your own shell profile — never in this
+project, never in your command history, never seen by the assistant. That's the whole setup. No MCP
+server to register. Full walkthrough: [docs/quickstart.md](docs/quickstart.md).
 
-Requires Node 18+, an Instantly **paid plan**, and at least one connected, warmed sending account.
+Requires Node 18+ (don't have it? the "ask Claude" option above installs it for you via nvm, no admin
+needed), an Instantly **paid plan**, and at least one connected, warmed sending account.
 
 ## Structure
 - **`core/`** is the shared Instantly plumbing every skill reuses (auth, the verb-to-REST CLI, config,
