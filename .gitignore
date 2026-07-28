@@ -1,0 +1,27 @@
+# Public repo = SHIP-SET ONLY (D-036, reverses D-012). Track only what a user needs to run the skill:
+#   core/  skills/  install.sh  install.ps1  bootstrap.sh  README.md  LICENSE  docs/quickstart.md
+# Everything below is build-time / internal / local and is kept OUT of the public repo.
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+
+# Node
+node_modules/
+npm-debug.log*
+*.log
+
+# User runtime data (API key never lives here, but profile/config might)
+.instantly-gtm/
+
+# Build-time & internal (not shipped, not public)
+CLAUDE.md
+SPEC.md
+context/
+docs/build/
+.claude/
+chatgpt-app-submission*.json
+
+# Dev / testing tooling (not for end users)
+reset-workspace.sh
