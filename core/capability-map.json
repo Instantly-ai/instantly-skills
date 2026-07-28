@@ -1,0 +1,68 @@
+{
+  "$meta": {
+    "transport": "rest",
+    "base_url": "https://api.instantly.ai/api/v2",
+    "generated_from": "context/openapi/api_v2.json + api-reference/*",
+    "note": "Stable verb -> Instantly v2 REST endpoint (D-023). The skill speaks VERBS; scripts/instantly.mjs resolves them here and calls REST with the INSTANTLY_API_KEY bearer. No MCP. Path params like {id}/{email}/{thread_id} are filled from --params. Destructive/account-risk verbs are NOT implemented (see never_call); the CLI refuses them. confirm:true verbs require --confirm.",
+    "confirm_gating": {
+      "resolved": "D-002/D-014/D-023: confirm-gated verbs require --confirm (the agent passes it only after the user's yes, or when the matching auto-mode toggle is on). Enforced in the CLI, not a hook.",
+      "auto_mode_config": {
+        "actions": { "replies": "send_reply", "interest": "set_interest", "campaign_edits": "update_campaign", "launch": "activate" },
+        "defaults": "all OFF; 'launch' stays OFF even when others are ON (SPEC §7). See DECISIONS D-014."
+      }
+    }
+  },
+  "verbs": {
+    "whoami":            { "method": "GET",   "path": "/workspaces/current" },
+    "find_count":        { "method": "POST",  "path": "/supersearch-enrichment/count-leads-from-supersearch" },
+    "find_preview":      { "method": "POST",  "path": "/supersearch-enrichment/preview-leads-from-supersearch" },
+    "enrich":            { "method": "POST",  "path": "/supersearch-enrichment/enrich-leads-from-supersearch", "confirm": true },
+    "enrich_run":        { "method": "POST",  "path": "/supersearch-enrichment/run", "confirm": true },
+    "verify_email":      { "method": "POST",  "path": "/email-verification" },
+    "verify_status":     { "method": "GET",   "path": "/email-verification/{email}" },
+    "verify_stats":      { "method": "GET",   "path": "/lead-lists/{id}/verification-stats" },
+    "create_lead_list":  { "method": "POST",  "path": "/lead-lists" },
+    "list_lead_lists":   { "method": "GET",   "path": "/lead-lists" },
+    "get_lead_list":     { "method": "GET",   "path": "/lead-lists/{id}" },
+    "add_leads":         { "method": "POST",  "path": "/leads/add" },
+    "list_leads":        { "method": "POST",  "path": "/leads/list" },
+    "get_lead":          { "method": "GET",   "path": "/leads/{id}" },
+    "create_campaign":   { "method": "POST",  "path": "/campaigns" },
+    "update_campaign":   { "method": "PATCH", "path": "/campaigns/{id}", "confirm": true },
+    "get_campaign":      { "method": "GET",   "path": "/campaigns/{id}" },
+    "list_campaigns":    { "method": "GET",   "path": "/campaigns" },
+    "sending_status":    { "method": "GET",   "path": "/campaigns/{id}/sending-status" },
+    "warmup_analytics":  { "method": "POST",  "path": "/accounts/warmup-analytics" },
+    "test_vitals":       { "method": "POST",  "path": "/accounts/test/vitals" },
+    "list_accounts":     { "method": "GET",   "path": "/accounts" },
+    "activate":          { "method": "POST",  "path": "/campaigns/{id}/activate", "confirm": true },
+    "list_replies":      { "method": "GET",   "path": "/emails" },
+    "get_reply":         { "method": "GET",   "path": "/emails/{id}" },
+    "count_unread":      { "method": "GET",   "path": "/emails/unread/count" },
+    "send_reply":        { "method": "POST",  "path": "/emails/reply", "confirm": true },
+    "set_interest":      { "method": "POST",  "path": "/leads/update-interest-status", "confirm": true },
+    "mark_read":         { "method": "POST",  "path": "/emails/threads/{thread_id}/mark-as-read" },
+    "analytics":         { "method": "GET",   "path": "/campaigns/analytics" },
+    "analytics_overview":{ "method": "GET",   "path": "/campaigns/analytics/overview" },
+    "analytics_steps":   { "method": "GET",   "path": "/campaigns/analytics/steps" },
+    "analytics_daily":   { "method": "GET",   "path": "/campaigns/analytics/daily" },
+    "get_background_job":{ "method": "GET",   "path": "/background-jobs/{id}" },
+    "list_background_jobs":{ "method": "GET", "path": "/background-jobs" }
+  },
+  "confirm_required": ["enrich", "enrich_run", "activate", "update_campaign", "send_reply", "set_interest"],
+  "never_call": [
+    "delete_campaign", "delete_account", "delete_lead", "delete_lead_list", "leads_bulk_delete",
+    "email_delete", "email_forward", "email_update", "update_account", "update_lead", "update_lead_list",
+    "accounts_warmup_disable", "blocklist_delete", "blocklist_update", "enrichment_update_settings",
+    "api_keys_create", "api_keys_delete", "api_keys_list",
+    "workspace_change_owner", "workspace_update", "workspace_members_create", "workspace_members_update",
+    "workspace_members_delete", "workspace_whitelabel_create", "workspace_whitelabel_delete",
+    "dfy_orders_create", "dfy_orders_cancel", "dfy_orders_check_domains", "dfy_orders_pre_warmed",
+    "webhooks_create", "webhooks_update", "webhooks_delete",
+    "crm_actions_delete_phone_number", "leads_remove_from_subsequence",
+    "custom_tags_delete", "custom_tags_update", "lead_labels_delete", "lead_labels_update",
+    "email_templates_delete", "subsequences_delete", "subsequences_update", "sales_flow_delete",
+    "sales_flow_update", "inbox_placement_delete", "inbox_placement_update",
+    "custom_prompt_templates_delete", "custom_prompt_templates_update", "workspace_group_members_delete"
+  ]
+}

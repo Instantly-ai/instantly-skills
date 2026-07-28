@@ -1,0 +1,92 @@
+{
+  "_meta": {
+    "purpose": "Acceptance prompts (SPEC §9). A cold agent + a valid INSTANTLY_API_KEY should pass these end to end. Verb names are the stable internal verbs from core/capability-map.json, run via `node ~/.instantly-gtm/core/instantly.mjs <verb>` (v2 REST; no MCP).",
+    "global_assertions": [
+      "No verb in core/capability-map.json.never_call is ever run (the CLI has no endpoint for them and refuses).",
+      "SKILL.md stays <= ~500 lines.",
+      "Every Instantly action is a mapped verb run through the CLI; no endpoint/URL is hardcoded in skill artifacts.",
+      "Confirm-gated verbs (activate, update_campaign, send_reply, set_interest) are only run with --confirm, after an explicit user yes (or when the matching auto-mode toggle is on)."
+    ]
+  },
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Find 200 Series-A fintech VPs of Sales and get them ready to email.",
+      "enters_at": "Step 1 (Find) → Step 2 (Enrich + verify)",
+      "expected_verbs_ordered": ["find_count", "find_preview", "enrich", "get_background_job", "verify_stats"],
+      "forbidden_verbs": ["create_campaign", "activate", "add_leads"],
+      "pass_criteria": [
+        "search_filters use exact enums: funding_type ['series_a'], level ['Vice President (VP)'], a Financial-Services industry mapping.",
+        "find_count precedes any enrich (count-before-spend).",
+        "Final list contains ONLY Verified rows; invalid/risky/catch_all/job_change reported and dropped.",
+        "A list_quality-scorecard grade is shown before hand-off."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Write a 4-step sequence for [offer] to that list.",
+      "enters_at": "Step 3 (Write — nested sequence-writer)",
+      "expected_verbs_ordered": [],
+      "forbidden_verbs": ["create_campaign", "update_campaign", "activate"],
+      "pass_criteria": [
+        "Output is a JSON block matching the campaign sequences[0] shape (steps[].{type:'email', delay, delay_unit, variants[].{subject, body}}).",
+        "Every {{variable}} resolves against the list fields; no unknown variables.",
+        "Spam-safe self-check ran; follow-ups thread; final step is a break-up.",
+        "No API call is made in this step (pure copywriting)."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Assemble the campaign as a draft.",
+      "enters_at": "Step 4 (Assemble)",
+      "expected_verbs_ordered": ["list_accounts", "create_campaign", "add_leads", "get_campaign"],
+      "forbidden_verbs": ["activate"],
+      "pass_criteria": [
+        "create_campaign precedes add_leads.",
+        "Only Verified leads attached, in batches <= 1000.",
+        "get_campaign confirms status == 0 (Draft).",
+        "Review summary shows name, N leads, sequence, schedule, senders, daily limit.",
+        "activate is NOT called."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Launch it, ramp safely from my two domains.",
+      "enters_at": "Step 5 (Launch)",
+      "expected_verbs_ordered": ["get_campaign", "warmup_analytics", "sending_status", "verify_stats", "activate"],
+      "forbidden_verbs": [],
+      "pass_criteria": [
+        "Preflight ran (warmup + sending health + verify re-check).",
+        "Confirm prompt shows all four: N leads, sequence, daily ramp, sending domains with health.",
+        "activate fires only after an explicit yes (or explicit auto.launch).",
+        "A cold/unhealthy domain fixture => refusal, no activate."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Which campaign is underperforming and why?",
+      "enters_at": "Step 7 (Report)",
+      "expected_verbs_ordered": ["analytics", "analytics_overview", "analytics_steps", "sending_status"],
+      "forbidden_verbs": ["create_campaign", "update_campaign", "activate", "add_leads", "send_reply", "set_interest", "enrich"],
+      "pass_criteria": [
+        "Analytics pulled; positive-reply rate headlined over vanity metrics.",
+        "At least one chart is rendered (host agent).",
+        "At least one concrete suggestion offered, framed as a single-variable experiment.",
+        "NOTHING is changed — zero write verbs called (guardrail 5)."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Any replies I should deal with?",
+      "enters_at": "Step 6 (Manage replies)",
+      "expected_verbs_ordered": ["count_unread", "list_replies"],
+      "forbidden_verbs": [],
+      "pass_criteria": [
+        "A single list_replies call with received + unread + latest_of_thread + preview_only filters.",
+        "Replies triaged into a table with proposed interest status per the lt_interest_status enum.",
+        "Draft responses proposed in the user's reply voice; booking link used for interested leads.",
+        "No send_reply or set_interest without an explicit confirm (or auto toggle); set_interest reported as queued (202)."
+      ]
+    }
+  ]
+}
