@@ -9,6 +9,8 @@
 //   node scripts/auth.mjs setup           # open the API-keys page + how to set the env var safely
 //   node scripts/auth.mjs setup --persist # guided: paste key hidden, verify, WRITE it to your shell
 //                                          #   profile (~/.zshrc etc.) so it persists. One command, no editor.
+//   node scripts/auth.mjs setup --web     # browser flow: opens a local page, you paste the key there,
+//                                          #   it verifies + saves. No terminal typing, key never in chat (D-038).
 //   node scripts/auth.mjs verify          # just verify the current env key
 //   node scripts/auth.mjs --check         # read a key from stdin (hidden), verify it, store NOTHING
 // The --persist mode is the ONLY path where auth.mjs writes the key, and only to the user's own shell
@@ -16,9 +18,12 @@
 // decision D-037, softens D-021's "never writes" for UX; same end-state as editing the profile by hand).
 
 import { spawn } from 'node:child_process';
+import { createServer } from 'node:http';
+import { randomBytes } from 'node:crypto';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { resolveKey, KEYFILE_PATH } from './key.mjs';
 
 const API_BASE = 'https://api.instantly.ai/api/v2';
@@ -27,6 +32,9 @@ const APP_UPGRADE_URL = 'https://app.instantly.ai/app/settings/billing';
 const ENV_VAR = 'INSTANTLY_API_KEY';
 // Real invocation path, so hints are copy-pasteable post-install (not a stale `scripts/` guess).
 const SELF = process.argv[1] || 'auth.mjs';
+const HERE = dirname(fileURLToPath(import.meta.url));
+const PAGE_PATH = join(HERE, 'setup-page.html'); // the browser connect page served by `setup --web`
+const WEB_TIMEOUT_MS = 5 * 60 * 1000;            // never leave a loopback listener running longer
 
 const SCOPES_HINT = [
   'campaigns:all', 'leads:all', 'lead_lists:all', 'emails:all',
@@ -195,19 +203,12 @@ function profilePath() {
   return join(home, '.zshrc'); // zsh is the macOS default
 }
 
-// Guided setup: open the keys page, read the key hidden, VERIFY it, then write it to the user's shell
-// profile. The key is never echoed, never passed as an arg (no history), and only written after it
-// verifies. This is the one place auth.mjs writes the key, and only to the user's own profile (D-037).
-async function cmdPersist() {
-  process.stdout.write('Guided key setup. Paste your key when asked below — it stays hidden, is never\n');
-  process.stdout.write('saved to your command history, and the assistant never sees it.\n\n');
-  if (!openUrl(KEYS_URL)) process.stdout.write(`Get your key here: ${KEYS_URL}\n`);
-  else process.stdout.write(`Opened ${KEYS_URL} — create a key there ("API Keys" → "Create API Key"), then:\n`);
-  const key = await readHiddenStdin();
-  if (!key) { process.stderr.write('No key provided. Nothing was written.\n'); process.exit(1); }
-  const result = await verifyKey(key);
-  if (!result.ok) { reportInvalid(result); process.stderr.write('\nKey NOT saved (it did not verify).\n'); process.exit(1); }
-
+// Persist a VERIFIED key. Writes the dedicated chmod-600 key file the CLI reads directly (works in
+// ANY shell, including the agent's non-interactive shell that never sources ~/.zshrc) and mirrors an
+// `export` line into the user's shell profile. The one place auth.mjs writes the key, only ever to
+// the user's own home, never a repo/skill config, and only after it verifies (D-037; reused by --web).
+// Never echoes the key. Returns { path, action, keyfileWarn } for the caller to report.
+function persistKey(key) {
   const path = profilePath();
   const line = `export ${ENV_VAR}="${key}"`;
   let content = existsSync(path) ? readFileSync(path, 'utf8') : '';
@@ -222,24 +223,132 @@ async function cmdPersist() {
     action = 'Saved your key to';
   }
   writeFileSync(path, content);
-  // Also write a dedicated key file the CLI reads directly (chmod 600). This is what makes it work in
-  // ANY shell, including the agent's non-interactive shell that never sources ~/.zshrc.
+  let keyfileWarn = null;
   try {
     mkdirSync(dirname(KEYFILE_PATH), { recursive: true });
     writeFileSync(KEYFILE_PATH, key + '\n', { mode: 0o600 });
   } catch (e) {
-    process.stderr.write(`(warn: could not write ${KEYFILE_PATH} (${e.code || e.message}); shell profile still set)\n`);
+    keyfileWarn = `could not write ${KEYFILE_PATH} (${e.code || e.message}); shell profile still set`;
   }
+  return { path, action, keyfileWarn };
+}
+
+// Guided setup: open the keys page, read the key hidden, VERIFY it, then persist it. The key is never
+// echoed, never passed as an arg (no history), and only written after it verifies.
+async function cmdPersist() {
+  process.stdout.write('Guided key setup. Paste your key when asked below. It stays hidden, is never\n');
+  process.stdout.write('saved to your command history, and the assistant never sees it.\n\n');
+  if (!openUrl(KEYS_URL)) process.stdout.write(`Get your key here: ${KEYS_URL}\n`);
+  else process.stdout.write(`Opened ${KEYS_URL} (create a key: "API Keys" then "Create API Key"), then:\n`);
+  const key = await readHiddenStdin();
+  if (!key) { process.stderr.write('No key provided. Nothing was written.\n'); process.exit(1); }
+  const result = await verifyKey(key);
+  if (!result.ok) { reportInvalid(result); process.stderr.write('\nKey NOT saved (it did not verify).\n'); process.exit(1); }
+
+  const { path, action, keyfileWarn } = persistKey(key);
+  if (keyfileWarn) process.stderr.write(`(warn: ${keyfileWarn})\n`);
   // Never echo the key — confirm by workspace + last-4 only.
   process.stdout.write(`\nConnected ✓  workspace: ${result.workspace}  (key ${last4(key)})\n`);
   process.stdout.write(`${action} ${path}, and a protected key file at ${KEYFILE_PATH}.\n`);
-  process.stdout.write(`You're set — no need to re-run this per session. Open a new chat to start using it.\n`);
+  process.stdout.write(`You're set. No need to re-run this per session. Open a new chat to start using it.\n`);
   process.exit(0);
+}
+
+// Guided setup in the BROWSER: start a loopback server, serve the styled connect page, open it, and
+// accept ONE posted key. The key travels browser → 127.0.0.1 → chmod-600 key file; it never enters
+// the terminal, shell history, or the chat/model context (D-038). Two loopback-CSRF layers: a random
+// per-run token echoed back on /save, plus a loopback-only Host check; the socket binds 127.0.0.1
+// (never 0.0.0.0). Falls back to `setup --persist` when a local browser/port isn't reachable.
+async function cmdWeb() {
+  let page;
+  try { page = readFileSync(PAGE_PATH, 'utf8'); }
+  catch {
+    process.stderr.write(`Setup page missing at ${PAGE_PATH}.\n`);
+    process.stderr.write(`Paste in the terminal instead: node "${SELF}" setup --persist\n`);
+    process.exit(1);
+  }
+  const token = randomBytes(24).toString('hex');
+  const html = page.replace('__SETUP_TOKEN__', token); // per-run token; standalone preview leaves it literal
+
+  const loopbackHost = (h) => /^(127\.0\.0\.1|localhost)(:\d+)?$/.test(h || '');
+
+  const finishOk = (res, result, key) => {
+    const { keyfileWarn } = persistKey(key);
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({ ok: true, workspace: result.workspace }));
+    process.stdout.write(`\nConnected ✓  workspace: ${result.workspace}  (key ${last4(key)})\n`);
+    if (keyfileWarn) process.stderr.write(`(warn: ${keyfileWarn})\n`);
+    process.stdout.write(`Saved to a protected key file at ${KEYFILE_PATH}. Open a new chat to start.\n`);
+    setTimeout(() => { server.close(); process.exit(0); }, 500); // let the response flush, then stop
+  };
+
+  const server = createServer((req, res) => {
+    if (req.method === 'GET' && (req.url === '/' || req.url.startsWith('/?'))) {
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' });
+      res.end(html);
+      return;
+    }
+    if (req.method === 'POST' && req.url === '/save') {
+      if (!loopbackHost(req.headers.host) || req.headers['x-instantly-setup'] !== token) {
+        res.writeHead(403, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Setup request rejected.' }));
+        return;
+      }
+      let raw = '';
+      req.on('data', (c) => { raw += c; if (raw.length > 8192) req.destroy(); }); // cap body
+      req.on('end', async () => {
+        let key = '';
+        try { key = String(JSON.parse(raw || '{}').key || '').trim(); } catch { /* bad json → empty */ }
+        if (!key) {
+          res.writeHead(400, { 'content-type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Paste your key first.' }));
+          return;
+        }
+        const result = await verifyKey(key);
+        if (!result.ok) {
+          const msg = result.kind === 'unauthorized' ? "That key didn't work. Copy it again from Instantly."
+            : result.kind === 'payment' ? 'That workspace has no active paid plan.'
+            : `Could not verify the key (${result.message}).`;
+          res.writeHead(400, { 'content-type': 'application/json' });
+          res.end(JSON.stringify({ error: msg }));
+          return;
+        }
+        finishOk(res, result, key);
+      });
+      return;
+    }
+    res.writeHead(404, { 'content-type': 'text/plain' });
+    res.end('not found');
+  });
+
+  server.on('error', (e) => {
+    process.stderr.write(`Could not start the local setup server (${e.code || e.message}).\n`);
+    process.stderr.write(`Paste in the terminal instead: node "${SELF}" setup --persist\n`);
+    process.exit(1);
+  });
+
+  server.listen(0, '127.0.0.1', () => {
+    const { port } = server.address();
+    const url = `http://127.0.0.1:${port}/`;
+    if (!openUrl(url)) process.stdout.write("Couldn't open your browser automatically.\n");
+    process.stdout.write(`Open this to connect: ${url}\n`);
+    process.stdout.write('Waiting for you to connect in the browser...\n');
+  });
+
+  // Hard timeout: never leave a listener running if the user closes the tab or the page can't load.
+  setTimeout(() => {
+    process.stdout.write('\nTimed out. Nothing was saved.\n');
+    process.stdout.write(`If the page could not load, paste in the terminal: node "${SELF}" setup --persist\n`);
+    server.close();
+    process.exit(0);
+  }, WEB_TIMEOUT_MS).unref();
 }
 
 async function main() {
   const cmd = process.argv[2] || 'status';
   const persist = process.argv.includes('--persist');
+  const web = process.argv.includes('--web');
+  if (cmd === 'setup' && web) return cmdWeb();
   if (cmd === 'setup' && persist) return cmdPersist();
   const arg = cmd.replace(/^--/, '');
   switch (arg) {
@@ -248,7 +357,7 @@ async function main() {
     case 'setup': cmdSetup(); return;
     case 'check': return cmdCheck();
     default:
-      process.stderr.write(`Unknown command "${process.argv[2]}". Use: status | setup | setup --persist | verify | --check\n`);
+      process.stderr.write(`Unknown command "${process.argv[2]}". Use: status | setup | setup --web | setup --persist | verify | --check\n`);
       process.exit(1);
   }
 }

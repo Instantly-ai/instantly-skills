@@ -9,7 +9,7 @@ The CLI already maps HTTP codes to a short message; this reference is how you SA
 ## HTTP / API layer (from `core/instantly.mjs` error map)
 | Raw | Say to the user | Next action |
 |---|---|---|
-| **401** unauthorized | "Your Instantly key isn't working, it may have been rotated or revoked." | Re-run key setup (`auth.mjs setup`); the skill never handles the key itself. |
+| **401** unauthorized | "Your Instantly key isn't working, it may have been rotated or revoked." | Re-run key setup (`auth.mjs setup --web`); the skill never handles the key itself. |
 | **402** payment required | "This needs an active paid plan, sending, enrichment and verification are locked without it." | Link `app.instantly.ai/settings/billing`, once. Don't retry. |
 | **403** forbidden | "Your key doesn't have permission for that." | Re-issue the key with the scopes onboarding lists. |
 | **404** not found | "I couldn't find that <campaign / list>." | Look it up by name (`list_campaigns`/`list_lead_lists`) and re-confirm which one. |

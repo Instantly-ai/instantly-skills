@@ -79,11 +79,13 @@ with `/instantly-gtm-find-leads`, `-write-sequence`, `-launch-campaign`, `-triag
    map and pings the API (whoami). The CLI finds the key automatically (env var, then the key file, then
    the user's shell profile) — you never need to `source` anything or set an env var in this session, so
    don't chase a "not set" red herring; just run doctor. If doctor still can't connect (key genuinely
-   missing/invalid), walk the user through
-   the guided one-liner `node __INSTANTLY_CORE__/auth.mjs setup --persist` (they paste the key into a
-   hidden prompt; it verifies and saves it to their shell profile). Tell them WHERE to run it and that it
-   works from any folder, and give the plain security "why" — see `references/conversation.md` ("Handing
-   the user a command"). Never handle the key yourself.
+   missing/invalid), connect the user with the browser flow: `node __INSTANTLY_CORE__/auth.mjs setup --web`.
+   A styled page opens in their browser, they paste the key there (or click "Get a key"), it verifies and
+   saves. Nothing to type in the terminal after that one command, and the key never passes through this
+   chat. If a browser can't open (headless/remote/sandboxed), fall back to
+   `node __INSTANTLY_CORE__/auth.mjs setup --persist` (hidden terminal paste). Either way, tell them WHERE
+   to run the command and that it works from any folder, and give the plain security "why" (see
+   `references/conversation.md`, "Handing the user a command"). Never handle the key yourself.
 2. **Load context.** `node __INSTANTLY_CORE__/config.mjs get` (auto-mode flags). Load the business profile +
    voice + results memory if present (`~/.instantly-gtm/profile/`, incl. `results.md`, what's worked
    before; project-local overrides global, see Setup phase). Start from what worked, not a blank page.

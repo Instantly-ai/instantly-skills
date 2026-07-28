@@ -29,22 +29,27 @@ git clone https://github.com/Instantly-ai/instantly-skills.git && cd instantly-s
 The installer puts the shared core at `~/.instantly-gtm/core/` and the skill in your agent's skills
 directory. Validate with `node ~/.instantly-gtm/core/instantly.mjs doctor`.
 
-## 2. Set your API key
-Run these in your **Terminal** (Mac: press Cmd+Space, type "Terminal", Enter · Windows: open PowerShell).
-It does not matter which folder you're in — these use full paths.
+## 2. Connect your account
+Run this in your **Terminal** (Mac: press Cmd+Space, type "Terminal", Enter · Windows: open PowerShell).
+It does not matter which folder you're in, these use full paths.
 
-Easiest (one command, paste your key when it asks — it stays hidden):
+Easiest (a page opens in your browser, paste your key there, it saves itself):
 ```bash
-node ~/.instantly-gtm/core/auth.mjs setup --persist   # opens the keys page, verifies, saves it for you
+node ~/.instantly-gtm/core/auth.mjs setup --web       # opens a "Connect your account" page in your browser
 node ~/.instantly-gtm/core/auth.mjs status            # shows Connected + your workspace
 ```
-Create the key on the page it opens: **API Keys → Create API Key** (shown once). Recommended
-least-privilege scopes are printed for you.
+On the page, paste your key (or click **Get a key** to create one: **API Keys → Create API Key**, shown
+once). It verifies, saves, and the tab closes itself. Nothing to type in the terminal after that command.
 
-**Why it's safe:** your key stays only in your own computer's shell profile — never in this project,
-never in your command history, and never seen by the assistant. It's the same as adding it by hand,
-just done for you. Prefer to do it yourself? Run `auth.mjs setup` (no `--persist`) and it shows the
-exact line to paste into `~/.zshrc`.
+Prefer the terminal, or on a machine with no browser (headless/remote)?
+```bash
+node ~/.instantly-gtm/core/auth.mjs setup --persist   # paste your key into a hidden terminal prompt
+```
+
+**Why it's safe:** your key stays only on your own computer, never in this project, never in your command
+history, and never seen by the assistant. With `--web` it goes straight from your browser to a protected
+file on your machine. Want to place it by hand instead? Run `auth.mjs setup` (no flag) and it prints the
+exact line to add to `~/.zshrc`.
 
 ## 3. One-time onboarding (recommended)
 Tell the skill your website ("set me up, my site is acme.com"). It reads the site, asks a couple of
@@ -81,7 +86,7 @@ spending credits always asks regardless. Check current settings: `node ~/.instan
 | Symptom | Fix |
 |---|---|
 | "not connected" / no data | Run `node ~/.instantly-gtm/core/instantly.mjs doctor`. It validates the map and pings the API. |
-| `401` unauthorized | Key invalid or revoked. Regenerate and re-set `INSTANTLY_API_KEY` (`node ~/.instantly-gtm/core/auth.mjs setup`). |
+| `401` unauthorized | Key invalid or revoked. Regenerate it and reconnect (`node ~/.instantly-gtm/core/auth.mjs setup --web`). |
 | `402` payment required | Workspace needs an active paid plan. Upgrade in-app. |
 | `429` rate limited | Back off. The skill paces itself (100/s, 6k/min; replies list is 20/min). |
 | Verb refused ("not implemented") | It's a destructive or account-risk action. Do it in the Instantly app; the CLI won't. |

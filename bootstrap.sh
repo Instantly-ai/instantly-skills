@@ -29,8 +29,9 @@ if [ "$#" -gt 0 ]; then ./install.sh "$@"; else ./install.sh instantly-gtm; fi
 
 cat <<'EOF'
 
-Next: set your Instantly API key
-  node ~/.instantly-gtm/core/auth.mjs setup
+Next: connect your Instantly account (opens a page in your browser)
+  node ~/.instantly-gtm/core/auth.mjs setup --web
+  (no browser? paste in the terminal instead: node ~/.instantly-gtm/core/auth.mjs setup --persist)
 Then verify the connection:
   node ~/.instantly-gtm/core/instantly.mjs doctor
 EOF
