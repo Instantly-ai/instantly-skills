@@ -48,7 +48,7 @@ Guardrails that don't turn off:
 - **Analytics only suggests.** It never changes a campaign on its own.
 - **Spend is gated.** Anything that costs credits (enrichment) asks first.
 - **No destructive actions, ever.** The CLI has no endpoint for delete, billing, or purchase, so they can't run.
-- **Your key never touches disk.** It lives only in the `INSTANTLY_API_KEY` environment variable.
+- **Your key stays on your machine.** Saved to a private file only you can read (plus your shell profile), never in this repo, never in your command history, and never seen by the assistant.
 
 Prefer speed? Turn on **auto mode** per action (replies, interest, campaign edits) to skip the prompt.
 The safety gates still run and it still reports what it did. Launch stays confirm-only unless you opt in.
@@ -70,9 +70,10 @@ Install the Instantly GTM skill for me, and explain each step as you go.
    (look up the current install command at github.com/nvm-sh/nvm), then the latest LTS Node.
 2. Install the skill by running:
    curl -fsSL https://raw.githubusercontent.com/Instantly-ai/instantly-skills/main/bootstrap.sh | bash
-3. Then help me set my Instantly API key with:
-   node ~/.instantly-gtm/core/auth.mjs setup --persist
-   I'll paste the key into the hidden prompt myself — don't ask me to share the key with you.
+3. Then connect my Instantly account with:
+   node ~/.instantly-gtm/core/auth.mjs setup --web
+   This opens a page in my browser where I paste the key myself. Don't ask me to share the key with you.
+   (If a browser can't open, share the url with me in chat and if that does not work as a last ditch effort use `setup --persist` instead — a hidden terminal paste.)
 4. When it's done, tell me to open a new chat to start using it.
 ```
 
@@ -88,12 +89,14 @@ git clone https://github.com/Instantly-ai/instantly-skills.git && cd instantly-s
 ./install.sh instantly-gtm          # or: --list (see all) · no args (picker) · --all
 # Windows: powershell -ExecutionPolicy Bypass -File .\install.ps1 instantly-gtm
 ```
-Then set your key. In your Terminal (Mac: Cmd+Space, type Terminal; Windows: PowerShell) — runs from any folder:
+Then connect your account. In your Terminal (Mac: Cmd+Space, type Terminal; Windows: PowerShell), runs from any folder:
 ```bash
-node ~/.instantly-gtm/core/auth.mjs setup --persist   # opens the keys page; paste your key when asked (hidden)
+node ~/.instantly-gtm/core/auth.mjs setup --web       # opens a page in your browser; paste your key there
+#   or, if a browser can't open (headless/remote):
+node ~/.instantly-gtm/core/auth.mjs setup --persist   # paste your key into a hidden terminal prompt
 ```
-It verifies the key and saves it for you. Your key stays only in your own shell profile — never in this
-project, never in your command history, never seen by the assistant. That's the whole setup. No MCP
+Either way it verifies the key and saves it for you. Your key stays only on your own computer, never in
+this project, never in your command history, never seen by the assistant. That's the whole setup. No MCP
 server to register. Full walkthrough: [docs/quickstart.md](docs/quickstart.md).
 
 Requires Node 18+ (don't have it? the "ask Claude" option above installs it for you via nvm, no admin
