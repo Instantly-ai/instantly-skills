@@ -61,12 +61,12 @@ also learns your tone from your edits and stops re-asking what you've already de
 ## Install (about 60 seconds)
 One line (macOS / Linux):
 ```bash
-curl -fsSL <RAW_BOOTSTRAP_URL> | bash                    # installs instantly-gtm + shared core
-#   or: curl -fsSL <RAW_BOOTSTRAP_URL> | bash -s -- --all    # every skill in the collection
+curl -fsSL https://raw.githubusercontent.com/Instantly-ai/instantly-skills/main/bootstrap.sh | bash                    # installs instantly-gtm + shared core
+#   or: curl -fsSL https://raw.githubusercontent.com/Instantly-ai/instantly-skills/main/bootstrap.sh | bash -s -- --all    # every skill in the collection
 ```
 Prefer to clone (or on Windows):
 ```bash
-git clone <REPO_URL> && cd instantly-skills
+git clone https://github.com/Instantly-ai/instantly-skills.git && cd instantly-skills
 ./install.sh instantly-gtm          # or: --list (see all) · no args (picker) · --all
 # Windows: powershell -ExecutionPolicy Bypass -File .\install.ps1 instantly-gtm
 ```

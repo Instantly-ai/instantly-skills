@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # bootstrap.sh — one-line installer for the Instantly Skills collection.
 # Usage (from anywhere):
-#   curl -fsSL <RAW_BOOTSTRAP_URL> | bash                 # installs instantly-gtm + shared core
-#   curl -fsSL <RAW_BOOTSTRAP_URL> | bash -s -- --all     # installs every skill
-#   curl -fsSL <RAW_BOOTSTRAP_URL> | bash -s -- <name..>  # installs named skill(s)
+#   curl -fsSL https://raw.githubusercontent.com/Instantly-ai/instantly-skills/main/bootstrap.sh | bash                 # installs instantly-gtm + shared core
+#   curl -fsSL https://raw.githubusercontent.com/Instantly-ai/instantly-skills/main/bootstrap.sh | bash -s -- --all     # installs every skill
+#   curl -fsSL https://raw.githubusercontent.com/Instantly-ai/instantly-skills/main/bootstrap.sh | bash -s -- <name..>  # installs named skill(s)
 # Clones the repo, runs install.sh, and points you at key setup. Re-runnable (pulls latest).
 # Override the source for testing: INSTANTLY_SKILLS_REPO=<url|path> INSTANTLY_SKILLS_SRC=<dir>
 set -euo pipefail
 
-REPO="${INSTANTLY_SKILLS_REPO:-<REPO_URL>}"          # swap <REPO_URL> at publish, e.g. https://github.com/<owner>/instantly-skills.git
+REPO="${INSTANTLY_SKILLS_REPO:-https://github.com/Instantly-ai/instantly-skills.git}"   # the collection repo (override via INSTANTLY_SKILLS_REPO for local testing)
 SRC="${INSTANTLY_SKILLS_SRC:-$HOME/.instantly-skills-src}"
 
 die(){ printf 'bootstrap: %s\n' "$*" >&2; exit 1; }

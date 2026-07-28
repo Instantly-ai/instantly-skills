@@ -12,12 +12,12 @@ From zero to a running campaign in a few minutes.
 ## 1. Install the skill(s)
 One line (macOS / Linux):
 ```bash
-curl -fsSL <RAW_BOOTSTRAP_URL> | bash            # installs instantly-gtm + shared core
-#   or: curl -fsSL <RAW_BOOTSTRAP_URL> | bash -s -- --all
+curl -fsSL https://raw.githubusercontent.com/Instantly-ai/instantly-skills/main/bootstrap.sh | bash            # installs instantly-gtm + shared core
+#   or: curl -fsSL https://raw.githubusercontent.com/Instantly-ai/instantly-skills/main/bootstrap.sh | bash -s -- --all
 ```
 Or clone it (and on Windows):
 ```bash
-git clone <REPO_URL> && cd instantly-skills
+git clone https://github.com/Instantly-ai/instantly-skills.git && cd instantly-skills
 ./install.sh --list              # see available skills
 ./install.sh instantly-gtm       # install this one (plus shared core). Or ./install.sh (picker), or --all
 # Windows: powershell -ExecutionPolicy Bypass -File .\install.ps1 instantly-gtm
