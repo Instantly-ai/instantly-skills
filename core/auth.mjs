@@ -4,13 +4,21 @@
 // no file. Verification is a direct REST call (auth must be provable before any other Instantly call).
 //
 // Usage:
-//   node scripts/auth.mjs            # status: is the key set + valid? show workspace + last-4
-//   node scripts/auth.mjs status     # (same)
-//   node scripts/auth.mjs setup      # open the API-keys page + how to set the env var safely
-//   node scripts/auth.mjs verify     # just verify the current env key
-//   node scripts/auth.mjs --check    # read a key from stdin (hidden), verify it, store NOTHING
+//   node scripts/auth.mjs                 # status: is the key set + valid? show workspace + last-4
+//   node scripts/auth.mjs status          # (same)
+//   node scripts/auth.mjs setup           # open the API-keys page + how to set the env var safely
+//   node scripts/auth.mjs setup --persist # guided: paste key hidden, verify, WRITE it to your shell
+//                                          #   profile (~/.zshrc etc.) so it persists. One command, no editor.
+//   node scripts/auth.mjs verify          # just verify the current env key
+//   node scripts/auth.mjs --check         # read a key from stdin (hidden), verify it, store NOTHING
+// The --persist mode is the ONLY path where auth.mjs writes the key, and only to the user's own shell
+// profile (never a repo, never skill config), after the user pastes it into a hidden prompt (owner
+// decision D-037, softens D-021's "never writes" for UX; same end-state as editing the profile by hand).
 
 import { spawn } from 'node:child_process';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 
 const API_BASE = 'https://api.instantly.ai/api/v2';
 const KEYS_URL = 'https://app.instantly.ai/app/settings/integrations';
@@ -69,19 +77,29 @@ async function verifyKey(key) {
 
 function printSetupText() {
   const lines = [];
-  lines.push('Set up your Instantly API key (stored ONLY as an environment variable, never on disk):');
+  lines.push('Set up your Instantly API key.');
   lines.push('');
-  lines.push(`  1. Opening ${KEYS_URL}`);
-  lines.push('     Open "API Keys" in the sidebar, then "Create API Key". The key is shown ONCE, so copy it now.');
-  lines.push('  2. Recommended least-privilege scopes (avoid all:all):');
-  lines.push(`     ${SCOPES_HINT.join(', ')}`);
-  lines.push('  3. Set it as an environment variable. Pick a SAFE, persistent home:');
-  lines.push('       • a shell profile (~/.zshrc / ~/.bashrc):   export INSTANTLY_API_KEY="<your-key>"');
-  lines.push('       • a secrets manager (1Password/op, doppler, etc.) that injects it, or');
-  lines.push('       • a CI secret for automated runs.');
-  lines.push('     Avoid typing `export INSTANTLY_API_KEY=<key>` straight into a terminal (it lands in');
-  lines.push('     shell history). Never put it in a repo .env or commit it anywhere.');
-  lines.push(`  4. Re-open your shell (or \`source\` the profile), then run:  node "${SELF}" status`);
+  lines.push('WHERE to run these: open your Terminal app (Mac: press Cmd+Space, type "Terminal", press');
+  lines.push('Enter · Windows: open "PowerShell"). It does not matter which folder you are in — these');
+  lines.push('commands work from anywhere because they use full paths.');
+  lines.push('');
+  lines.push('Why it is set up this way: your key is a secret, like a password. It is stored only in your');
+  lines.push('own computer\'s shell profile, never in this project and never anywhere the assistant can read,');
+  lines.push('and it is never saved to your command history. The assistant never sees or types it.');
+  lines.push('');
+  lines.push('EASIEST (one command): paste your key when it asks (it stays hidden and is saved for you):');
+  lines.push(`   node "${SELF}" setup --persist`);
+  lines.push('   Get your key first at the page opening now: "API Keys" in the sidebar, then "Create API');
+  lines.push('   Key" (it is shown once, so copy it). Recommended scopes (avoid all:all):');
+  lines.push(`   ${SCOPES_HINT.join(', ')}`);
+  lines.push('   When it prints "Connected", open a NEW terminal + a new chat and you are ready.');
+  lines.push('');
+  lines.push('PREFER to do it yourself (the assistant never writes anything):');
+  lines.push('   1. Create the key on the page (above).');
+  lines.push('   2. Open your shell profile in a simple editor:  open -e ~/.zshrc   (Mac TextEdit)');
+  lines.push('      and add this line, pasting your real key:   export INSTANTLY_API_KEY="your-key-here"');
+  lines.push('      Editing the file (not typing `export ...` in the terminal) keeps the key out of history.');
+  lines.push(`   3. Load + verify:  source ~/.zshrc && node "${SELF}" status`);
   process.stdout.write(lines.join('\n') + '\n');
 }
 
@@ -162,15 +180,66 @@ async function cmdCheck() {
   process.exit(1);
 }
 
+// Which shell profile to write to, based on the user's login shell.
+function profilePath() {
+  const home = homedir();
+  const shell = (process.env.SHELL || '').toLowerCase();
+  if (shell.includes('bash')) {
+    const bashrc = join(home, '.bashrc');
+    const bashProfile = join(home, '.bash_profile');
+    if (existsSync(bashrc)) return bashrc;
+    if (existsSync(bashProfile)) return bashProfile;
+    return bashrc;
+  }
+  return join(home, '.zshrc'); // zsh is the macOS default
+}
+
+// Guided setup: open the keys page, read the key hidden, VERIFY it, then write it to the user's shell
+// profile. The key is never echoed, never passed as an arg (no history), and only written after it
+// verifies. This is the one place auth.mjs writes the key, and only to the user's own profile (D-037).
+async function cmdPersist() {
+  process.stdout.write('Guided key setup. Paste your key when asked below — it stays hidden, is never\n');
+  process.stdout.write('saved to your command history, and the assistant never sees it.\n\n');
+  if (!openUrl(KEYS_URL)) process.stdout.write(`Get your key here: ${KEYS_URL}\n`);
+  else process.stdout.write(`Opened ${KEYS_URL} — create a key there ("API Keys" → "Create API Key"), then:\n`);
+  const key = await readHiddenStdin();
+  if (!key) { process.stderr.write('No key provided. Nothing was written.\n'); process.exit(1); }
+  const result = await verifyKey(key);
+  if (!result.ok) { reportInvalid(result); process.stderr.write('\nKey NOT saved (it did not verify).\n'); process.exit(1); }
+
+  const path = profilePath();
+  const line = `export ${ENV_VAR}="${key}"`;
+  let content = existsSync(path) ? readFileSync(path, 'utf8') : '';
+  const re = new RegExp(`^export ${ENV_VAR}=.*$`, 'm');
+  let action;
+  if (re.test(content)) {
+    content = content.replace(re, line);
+    action = 'Updated your existing key in';
+  } else {
+    const sep = content && !content.endsWith('\n') ? '\n' : '';
+    content += `${sep}\n# Instantly API key (added by instantly-gtm)\n${line}\n`;
+    action = 'Saved your key to';
+  }
+  writeFileSync(path, content);
+  // Never echo the key — confirm by workspace + last-4 only.
+  process.stdout.write(`\nConnected ✓  workspace: ${result.workspace}  (key ${last4(key)})\n`);
+  process.stdout.write(`${action} ${path}.\n`);
+  process.stdout.write(`Now open a NEW terminal (or run: source ${path}) and a new chat — you're ready.\n`);
+  process.exit(0);
+}
+
 async function main() {
-  const arg = (process.argv[2] || 'status').replace(/^--/, '');
+  const cmd = process.argv[2] || 'status';
+  const persist = process.argv.includes('--persist');
+  if (cmd === 'setup' && persist) return cmdPersist();
+  const arg = cmd.replace(/^--/, '');
   switch (arg) {
     case 'status': return cmdStatus();
     case 'verify': return cmdStatus({ verifyOnly: true });
     case 'setup': cmdSetup(); return;
     case 'check': return cmdCheck();
     default:
-      process.stderr.write(`Unknown command "${process.argv[2]}". Use: status | setup | verify | --check\n`);
+      process.stderr.write(`Unknown command "${process.argv[2]}". Use: status | setup | setup --persist | verify | --check\n`);
       process.exit(1);
   }
 }

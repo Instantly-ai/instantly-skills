@@ -25,14 +25,22 @@ git clone https://github.com/Instantly-ai/instantly-skills.git && cd instantly-s
 The installer puts the shared core at `~/.instantly-gtm/core/` and the skill in your agent's skills
 directory. Validate with `node ~/.instantly-gtm/core/instantly.mjs doctor`.
 
-## 2. Set your API key (env var only, never stored by the skill)
+## 2. Set your API key
+Run these in your **Terminal** (Mac: press Cmd+Space, type "Terminal", Enter · Windows: open PowerShell).
+It does not matter which folder you're in — these use full paths.
+
+Easiest (one command, paste your key when it asks — it stays hidden):
 ```bash
-node ~/.instantly-gtm/core/auth.mjs setup     # opens the API-keys page and shows how to set INSTANTLY_API_KEY safely
-node ~/.instantly-gtm/core/auth.mjs status    # verifies the key and prints your workspace
+node ~/.instantly-gtm/core/auth.mjs setup --persist   # opens the keys page, verifies, saves it for you
+node ~/.instantly-gtm/core/auth.mjs status            # shows Connected + your workspace
 ```
-Create the key at **app.instantly.ai → Settings → Integrations → API Keys** (it's shown once). Put it
-in a shell profile or secrets manager. Avoid an inline `export` (it lands in shell history) and never
-commit it to a repo `.env`. Recommended least-privilege scopes are printed by `setup`.
+Create the key on the page it opens: **API Keys → Create API Key** (shown once). Recommended
+least-privilege scopes are printed for you.
+
+**Why it's safe:** your key stays only in your own computer's shell profile — never in this project,
+never in your command history, and never seen by the assistant. It's the same as adding it by hand,
+just done for you. Prefer to do it yourself? Run `auth.mjs setup` (no `--persist`) and it shows the
+exact line to paste into `~/.zshrc`.
 
 ## 3. One-time onboarding (recommended)
 Tell the skill your website ("set me up, my site is acme.com"). It reads the site, asks a couple of

@@ -77,7 +77,10 @@ with `/instantly-gtm-find-leads`, `-write-sequence`, `-launch-campaign`, `-triag
 
 1. **Key valid + CLI healthy?** Run `node __INSTANTLY_CORE__/instantly.mjs doctor`, it validates the capability
    map and pings the API (whoami). If `INSTANTLY_API_KEY` isn't set / is invalid, walk the user through
-   `node __INSTANTLY_CORE__/auth.mjs setup` (creates + points them at setting the env var). Never handle the key yourself.
+   the guided one-liner `node __INSTANTLY_CORE__/auth.mjs setup --persist` (they paste the key into a
+   hidden prompt; it verifies and saves it to their shell profile). Tell them WHERE to run it and that it
+   works from any folder, and give the plain security "why" — see `references/conversation.md` ("Handing
+   the user a command"). Never handle the key yourself.
 2. **Load context.** `node __INSTANTLY_CORE__/config.mjs get` (auto-mode flags). Load the business profile +
    voice + results memory if present (`~/.instantly-gtm/profile/`, incl. `results.md`, what's worked
    before; project-local overrides global, see Setup phase). Start from what worked, not a blank page.
