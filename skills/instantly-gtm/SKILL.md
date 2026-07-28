@@ -76,7 +76,10 @@ with `/instantly-gtm-find-leads`, `-write-sequence`, `-launch-campaign`, `-triag
 > install.sh, tell the user to run it.
 
 1. **Key valid + CLI healthy?** Run `node __INSTANTLY_CORE__/instantly.mjs doctor`, it validates the capability
-   map and pings the API (whoami). If `INSTANTLY_API_KEY` isn't set / is invalid, walk the user through
+   map and pings the API (whoami). The CLI finds the key automatically (env var, then the key file, then
+   the user's shell profile) — you never need to `source` anything or set an env var in this session, so
+   don't chase a "not set" red herring; just run doctor. If doctor still can't connect (key genuinely
+   missing/invalid), walk the user through
    the guided one-liner `node __INSTANTLY_CORE__/auth.mjs setup --persist` (they paste the key into a
    hidden prompt; it verifies and saves it to their shell profile). Tell them WHERE to run it and that it
    works from any folder, and give the plain security "why" — see `references/conversation.md` ("Handing

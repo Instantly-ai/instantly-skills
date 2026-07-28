@@ -16,9 +16,10 @@
 // decision D-037, softens D-021's "never writes" for UX; same end-state as editing the profile by hand).
 
 import { spawn } from 'node:child_process';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
+import { resolveKey, KEYFILE_PATH } from './key.mjs';
 
 const API_BASE = 'https://api.instantly.ai/api/v2';
 const KEYS_URL = 'https://app.instantly.ai/app/settings/integrations';
@@ -150,16 +151,16 @@ function reportInvalid(result) {
 }
 
 async function cmdStatus({ verifyOnly = false } = {}) {
-  const key = process.env[ENV_VAR];
+  const { key, source } = resolveKey();
   if (!key) {
     process.stderr.write(`${ENV_VAR} is not set.\n`);
     if (!verifyOnly) { process.stderr.write('\n'); printSetupText(); }
-    process.stderr.write(`\nRun \`node "${SELF}" setup\` to open the API-keys page.\n`);
+    process.stderr.write(`\nRun \`node "${SELF}" setup --persist\` to set it.\n`);
     process.exit(1);
   }
   const result = await verifyKey(key);
   if (result.ok) {
-    process.stdout.write(`Connected ✓  workspace: ${result.workspace}  (key ${last4(key)})\n`);
+    process.stdout.write(`Connected ✓  workspace: ${result.workspace}  (key ${last4(key)}, from ${source})\n`);
     process.exit(0);
   }
   reportInvalid(result);
@@ -221,10 +222,18 @@ async function cmdPersist() {
     action = 'Saved your key to';
   }
   writeFileSync(path, content);
+  // Also write a dedicated key file the CLI reads directly (chmod 600). This is what makes it work in
+  // ANY shell, including the agent's non-interactive shell that never sources ~/.zshrc.
+  try {
+    mkdirSync(dirname(KEYFILE_PATH), { recursive: true });
+    writeFileSync(KEYFILE_PATH, key + '\n', { mode: 0o600 });
+  } catch (e) {
+    process.stderr.write(`(warn: could not write ${KEYFILE_PATH} (${e.code || e.message}); shell profile still set)\n`);
+  }
   // Never echo the key — confirm by workspace + last-4 only.
   process.stdout.write(`\nConnected ✓  workspace: ${result.workspace}  (key ${last4(key)})\n`);
-  process.stdout.write(`${action} ${path}.\n`);
-  process.stdout.write(`Now open a NEW terminal (or run: source ${path}) and a new chat — you're ready.\n`);
+  process.stdout.write(`${action} ${path}, and a protected key file at ${KEYFILE_PATH}.\n`);
+  process.stdout.write(`You're set — no need to re-run this per session. Open a new chat to start using it.\n`);
   process.exit(0);
 }
 
