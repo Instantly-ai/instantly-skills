@@ -17,6 +17,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { resolveKey } from './key.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const MAP_PATH = join(HERE, 'capability-map.json');
@@ -65,8 +66,8 @@ async function callVerb(map, verb, params, confirm, baseOverride) {
   if (spec.confirm && !confirm) {
     fail(`"${verb}" changes state and is confirm-gated. Re-run with --confirm ONLY after the user has said yes (or the matching auto-mode toggle is on).`);
   }
-  const key = process.env[ENV_VAR];
-  if (!key) fail(`${ENV_VAR} is not set. Run: node "${AUTH}" setup`);
+  const { key } = resolveKey();
+  if (!key) fail(`${ENV_VAR} is not set. Run: node "${AUTH}" setup --persist`);
 
   const base = baseOverride || map.$meta.base_url;
   // Fill {path params} from params; the rest go to query (GET) or body (POST/PATCH).
@@ -120,8 +121,8 @@ function doctor(map) {
   process.stdout.write(problems.length ? `map issues:\n  ${problems.join('\n  ')}\n`
     : `capability map: valid ✓ (${Object.keys(map.verbs).length} verbs, ${map.never_call.length} refused)\n`);
   // Ping the API if a key is present (same call as auth.mjs).
-  if (process.env[ENV_VAR]) return callVerb(map, 'whoami', {}, false, null);
-  process.stdout.write(`${ENV_VAR} not set — skipping API ping. Run: node "${AUTH}" setup\n`);
+  if (resolveKey().key) return callVerb(map, 'whoami', {}, false, null);
+  process.stdout.write(`${ENV_VAR} not set — skipping API ping. Run: node "${AUTH}" setup --persist\n`);
   process.exit(problems.length ? 1 : 0);
 }
 

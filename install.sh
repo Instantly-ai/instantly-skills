@@ -55,20 +55,31 @@ fi
 
 # --- uninstall ---
 if [ "$MODE" = "uninstall" ]; then
-  targets=("${NAMES[@]}"); [ "$WANT_ALL" = 1 ] && targets=("${AVAILABLE[@]}")
+  # Build targets without expanding a possibly-empty array under `set -u` (macOS bash 3.2 errors on that).
+  targets=()
+  if [ "$WANT_ALL" = 1 ]; then
+    [ "${#AVAILABLE[@]}" -gt 0 ] && targets=("${AVAILABLE[@]}")
+  elif [ "${#NAMES[@]}" -gt 0 ]; then
+    targets=("${NAMES[@]}")
+  fi
   [ "${#targets[@]}" -eq 0 ] && [ "$PURGE" = 0 ] && die "name a skill to uninstall, or --all / --purge."
-  for name in "${targets[@]}"; do
+  i=0; while [ "$i" -lt "${#targets[@]}" ]; do
+    name="${targets[$i]}"; i=$((i+1))
     rm -rf "${SKILLS_DIR:?}/${name}"
     for sc in "${SKILLS_DIR}/${name}-"*/; do [ -d "$sc" ] && rm -rf "$sc"; done
     log "removed skill: $name"
   done
-  if [ "$PURGE" = 1 ]; then rm -rf "$CORE_HOME"; log "removed shared core: $CORE_HOME (config/profile left intact)"; fi
+  if [ "$PURGE" = 1 ]; then rm -rf "${CORE_HOME:?}"; log "removed shared core: $CORE_HOME (config/profile left intact)"; fi
   exit 0
 fi
 
 # --- choose skills to install ---
-sel=("${NAMES[@]}")
-if [ "$WANT_ALL" = 1 ]; then sel=("${AVAILABLE[@]}"); fi
+sel=()
+if [ "$WANT_ALL" = 1 ]; then
+  [ "${#AVAILABLE[@]}" -gt 0 ] && sel=("${AVAILABLE[@]}")
+elif [ "${#NAMES[@]}" -gt 0 ]; then
+  sel=("${NAMES[@]}")
+fi
 if [ "${#sel[@]}" -eq 0 ]; then
   if [ -t 0 ]; then
     echo "Which skills to install? (space-separated numbers, or 'a' for all)"
