@@ -3,13 +3,17 @@
 From zero to a running campaign in a few minutes.
 
 ## Prerequisites
-- **Node 18+** (`node --version`).
+- **Node 18+** (`node --version`). Don't have it? Ask Claude to install it (see step 1), or use nvm — no admin needed.
 - An **Instantly paid plan**. Sending, enrichment, and verification return `402` without one.
 - At least one **connected, warmed sending account** in Instantly (the skill refuses cold domains).
 - A bash-capable agent (Claude Code, Claude Desktop, or Codex). **No MCP server required**: the skill
   talks to Instantly through its own bundled CLI over the REST API.
 
 ## 1. Install the skill(s)
+Easiest: **ask Claude to install it for you** — open Claude Code in a new folder and paste the prompt from
+the [README](../README.md#install-about-60-seconds); it checks/installs Node, installs the skill, and
+sets up your key. Or do it yourself:
+
 One line (macOS / Linux):
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Instantly-ai/instantly-skills/main/bootstrap.sh | bash            # installs instantly-gtm + shared core
