@@ -103,11 +103,13 @@ Markdown** card in the chat message (see `references/visual-kit.md`, the single 
 plan card; performance → hero positive-reply number + drop-off funnel + which-email-wins (`analytics.md`);
 leads → result card; launch → the four-part launch card; DFY order → the simulate/confirm card; brief →
 the status-tagged digest; draft → the inbox-style email preview.
-Rules: render Markdown in the message (a titled table, a `▓▓▓░░` bar, status as bold/label), it works on
-every surface including the terminal. **Never create a side-panel/published artifact for these cards** and
-never dump raw HTML, an artifact opens off to the side, which defeats the point (artifacts only if the
-user explicitly wants a shareable page). The visual is presentation only: it never replaces a confirmation
-or a gate (it **shows** it), and it obeys the same voice (no emoji in copy; use labels).
+Rules: where an inline visual-widget tool exists (claude.ai), render reports as an inline chart and
+decisions as an inline card grid whose buttons call `sendPrompt(...)`, per `references/inline-visuals.md`.
+Otherwise render Markdown in the message (a titled table, a `▓▓▓░░` bar, status as bold/label), which
+works on every surface including the terminal. **Never create a file / side-panel artifact for these
+cards** (a renderable file opens off to the side, the exact bug), inline widget or Markdown only
+(artifacts only if the user explicitly wants a downloadable/shareable dashboard). The visual is
+presentation only: it never replaces a confirmation or a gate (it **shows** it), same voice (no emoji).
 
 ## Run it for them, don't send them to a terminal (hand-hold)
 Assume the user is not technical. For the mechanical **auth / diagnostic** commands, **you have a shell,

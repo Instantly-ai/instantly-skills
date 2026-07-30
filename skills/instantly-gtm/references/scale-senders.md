@@ -55,7 +55,8 @@ Build a grounded recommendation from the persona and their §3 pre-warmed/fresh 
 - Mailbox math (from the API, don't guess): **Google / AirMail = up to 5 mailboxes per domain** (billed
   per mailbox monthly); **Microsoft/Outlook = 50 per new domain** (billed per domain monthly). So for a
   Google plan, `domains = ceil(added_mailboxes ÷ 5)`.
-Render the **simulation card** inline (per `references/visual-kit.md`, prefer inline + interactive):
+Render the **simulation card** inline (per `references/visual-kit.md` → `inline-visuals.md`: a decision
+card with a `sendPrompt` "place it" button where a widget tool exists, else Markdown + typed reply):
 domains, mailboxes, provider, new capacity, clearly marked "Simulation, not placed". Nothing is bought
 here. Always offer the choices in text too ("reply place it / edit / wait for pre-warmed"), never rely on
 a button, and never make the user open a link to act.

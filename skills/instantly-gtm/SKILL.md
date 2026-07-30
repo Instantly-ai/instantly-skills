@@ -11,7 +11,9 @@ when_to_use: >-
   Also trigger on broader GTM intent even when phrased loosely: "help me get more customers",
   "grow my pipeline", "I need meetings", "who should I be reaching out to", "improve my outreach",
   "set up cold email", "my campaign isn't working", or just "/instantly-gtm". When in doubt about a
-  sales/outbound/pipeline ask, load this and orient the user.
+  sales/outbound/pipeline ask, load this and orient the user. When a campaign report is pulled, the user
+  asks how a campaign is doing, campaigns are compared, or a scale/pause/test decision comes up, render it
+  INLINE in the chat (a chart or decision cards), never a side-panel file.
 ---
 
 # Instantly GTM: outbound orchestrator
@@ -70,12 +72,14 @@ with `/instantly-gtm-find-leads`, `-write-sequence`, `-launch-campaign`, `-triag
   (buys mailboxes). Write/act: `activate`, `update_campaign`, `send_reply`, `set_interest`. All refuse to run without `--confirm`. Pass
   it ONLY after the user says yes (or when the matching auto-mode toggle is on). This makes the spend and
   send gates code-level, not just an instruction.
-- **Render, don't recite.** When a step produces a bounded result (leads, a campaign, analytics, a
-  sequence, a draft, a launch, a DFY order, a capacity check), render it as a card/metric/chart in
-  Instantly's design language, not a paragraph. `references/visual-kit.md` is the shared component kit
-  and tokens. Render only when the surface supports it; otherwise fall back to clean markdown (never dump
-  raw HTML). Visuals are presentation only, they **show** the gate (preview / simulation / confirm /
-  cold-domain), never bypass it, and never render the key.
+- **Render, don't recite, INLINE.** When a step produces a bounded result (leads, a campaign, analytics,
+  a launch, a DFY order, a capacity check), render it IN the chat. Where an inline visual-widget tool
+  exists (claude.ai): reports → an inline chart, decisions → an inline card grid whose buttons call
+  `sendPrompt(...)` (see `references/inline-visuals.md`). Otherwise → a clean Markdown card + Mermaid
+  (`references/visual-kit.md`). The email **sequence draft stays Markdown** (it's copy). **Never create a
+  file / side-panel artifact for a card** (that's the recurring side-panel bug); an artifact only if the
+  user explicitly wants a downloadable dashboard. Visuals are presentation only, they **show** the gate
+  (preview / simulation / confirm / cold-domain), never bypass it, and never render the key.
 - **Progressive disclosure.** This file routes; the detail for each step lives in `references/` and
   is loaded only when you work that step. Keep answers grounded in the loaded reference.
 

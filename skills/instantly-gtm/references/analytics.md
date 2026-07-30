@@ -34,13 +34,14 @@ sent** ABOVE vanity metrics. Positive comes from `analytics_overview` (`total_in
 - Bounce < 3% is fine; **> 5% = stop and clean** the list/domains.
 - A high raw reply rate that's mostly "not interested"/"unsubscribe" is a bad sign, not a good one.
 
-## Charts (stylized Markdown + Mermaid, in the chat)
-Render the report as stylized **Markdown** in the message: a big bold hero number, a small metric table,
-and the drop-off funnel as `▓▓▓░░` bars. Use a **Mermaid** flowchart for the funnel where the host renders
-it inline, always with the Markdown bar version alongside (some hosts show mermaid as a code block).
-**Never build an HTML dashboard or an artifact for a report** (see `references/visual-kit.md`), inline
-Markdown + Mermaid only. Lead with the number that matters, then the shape, then one flat suggestion
-(voice: `conversation.md`).
+## Charts (inline widget where available, else Markdown + Mermaid)
+Render the report IN the chat. Where an inline visual-widget tool exists (claude.ai), use it: a Chart.js
+report = a metric-card strip (2–4 KPIs) + a custom legend + the reply-rate/funnel chart, per
+`references/inline-visuals.md` (CSS-variable theming, Instantly hex dataset colors, one y-axis, aria).
+Otherwise fall back to stylized **Markdown** (bold hero number, metric table, `▓▓▓░░` funnel bars) + a
+**Mermaid** funnel where it renders. **Never build a file / HTML dashboard / artifact for a report**
+(that side-panels it), inline widget or Markdown only. Lead with the number that matters, then the shape,
+then one flat suggestion (voice: `conversation.md`).
 
 **The report layout (in this order):**
 1. **Hero, positive-reply rate.** The north-star as one large number + a small trend sparkline
