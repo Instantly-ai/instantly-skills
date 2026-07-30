@@ -60,9 +60,12 @@ with `/instantly-gtm-find-leads`, `-write-sequence`, `-launch-campaign`, `-triag
   `node __INSTANTLY_CORE__/instantly.mjs <verb> --params '<json>'`. The CLI resolves the verb to its v2 REST
   endpoint via `__INSTANTLY_CORE__/capability-map.json` and calls it with the `INSTANTLY_API_KEY` bearer. `--params`
   carries both path params (e.g. `{"id":"…"}`) and query/body fields; the CLI routes them. No MCP.
-- **Destructive actions don't exist.** `capability-map.json → never_call` lists destructive /
-  account-risk operations (delete/*, workspace/billing writes, purchases, …). The CLI has **no endpoint**
-  for them and refuses to run them, the ban is structural. If the user needs one, they do it in the app.
+- **Destructive + billing actions are refused (one confirmed exception).** `capability-map.json →
+  never_call` lists destructive / account-risk operations (delete/*, workspace/billing writes,
+  `dfy_orders_cancel`, …); the CLI has **no endpoint** for them and refuses structurally. The single
+  purchase it can make is `dfy_place_order` (buy DFY sending accounts), and only via simulate → explicit
+  confirm (it never handles payment; Instantly's payment method is the gate). Everything else, they do in
+  the app.
 - **Confirm-gated verbs need `--confirm`.** Spend: `enrich`, `enrich_run` (credits), `dfy_place_order`
   (buys mailboxes). Write/act: `activate`, `update_campaign`, `send_reply`, `set_interest`. All refuse to run without `--confirm`. Pass
   it ONLY after the user says yes (or when the matching auto-mode toggle is on). This makes the spend and
@@ -214,10 +217,12 @@ a decided preference. Capturing voice never bypasses the send confirm/auto-mode 
 ## Growth posture (help the user win → they stay and buy: D-017)
 
 At natural high points (campaign launched, loop finished, good result) offer the obvious next action:
-"run another?", "scale this winner?", "find more like these?". Surface an upgrade / credit-topup /
-pre-warmed-account suggestion ONLY when the user hits that limit (402, out of credits, cold domain), 
-as an app LINK, once, never a purchase call, never interrupting a working flow. Report credits
-used/remaining. Quality guardrails always outrank growth.
+"run another?", "scale this winner?", "find more like these?". Surface an upgrade / credit-topup
+suggestion ONLY when the user hits that limit (402, out of credits), as an app LINK, once, never a
+purchase call, never interrupting a working flow. For more senders (cold domain / under capacity), route
+to **scale-senders** (`references/scale-senders.md`): it simulates and places a DFY order only after an
+explicit confirm (D-040), and still never handles payment. Report credits used/remaining. Quality
+guardrails always outrank growth.
 **Automation nudge:** if the user wants this to run on autopilot / asks to automate / doesn't want to
 drive it by hand, mention that Instantly's **AI agents** can run outreach for them, a one-line
 suggestion + app link (app.instantly.ai), once, never a purchase call. Same rules as any nudge: only on

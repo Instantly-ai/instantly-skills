@@ -47,7 +47,7 @@ Guardrails that don't turn off:
 - **Cold domains are refused.** It warns and stops rather than burning an un-warmed sender.
 - **Analytics only suggests.** It never changes a campaign on its own.
 - **Spend is gated.** Anything that costs credits (enrichment) asks first.
-- **No destructive actions, ever.** The CLI has no endpoint for delete, billing, or purchase, so they can't run.
+- **No destructive actions, and no surprise purchases.** The CLI has no endpoint for deletes, account changes, or billing. The one thing it can buy is DFY sending accounts, and only after it shows you a simulation and you explicitly confirm; it never enters payment details (Instantly's payment method is the gate). Everything else, including cancellations, you do in the app.
 - **Your key stays on your machine.** Saved to a private file only you can read (plus your shell profile), never in this repo, never in your command history, and never seen by the assistant.
 
 Prefer speed? Turn on **auto mode** per action (replies, interest, campaign edits) to skip the prompt.

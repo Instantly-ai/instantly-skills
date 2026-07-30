@@ -1,10 +1,12 @@
 ---
 name: instantly-gtm-scale-senders
 description: >-
-  Shortcut into the Instantly GTM loop, scale your sending infrastructure: check if you have enough
-  warmed mailboxes for a campaign, and buy pre-configured Done-For-You mailboxes/domains from Instantly
-  without leaving chat. Trigger on "do I have enough inboxes", "I need more mailboxes/domains",
-  "scale my sending", "my domain is cold, get me more senders".
+  Shortcut into the Instantly GTM loop, view and scale your sending infrastructure: see your sending
+  accounts and DFY orders, check if you have enough warmed mailboxes for a campaign, and buy
+  pre-configured Done-For-You mailboxes/domains from Instantly without leaving chat. Trigger on "show my
+  sending accounts / infra", "how many inboxes/mailboxes/domains do I have", "list my DFY orders", "do I
+  have enough inboxes", "I need more mailboxes/domains", "scale my sending", "my domain is cold, get me
+  more senders".
 ---
 
 # Scale senders (Instantly GTM: sending infrastructure)

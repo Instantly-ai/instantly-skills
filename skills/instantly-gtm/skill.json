@@ -24,6 +24,6 @@
     { "suffix": "launch-campaign",   "description": "Assemble a draft and launch it safely (steps 4-5)." },
     { "suffix": "triage-replies",    "description": "Triage the inbox, draft responses, book meetings (step 6)." },
     { "suffix": "check-performance", "description": "Pull analytics, chart, and suggest the next change (step 7)." },
-    { "suffix": "scale-senders",     "description": "Check sending capacity and buy DFY mailboxes/domains (simulate then confirm)." }
+    { "suffix": "scale-senders",     "description": "View your sending accounts/DFY orders, check capacity, and buy DFY mailboxes/domains (simulate then confirm)." }
   ]
 }

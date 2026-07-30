@@ -5,6 +5,13 @@ what they have, size the gap, and (if they want) buy pre-configured mailboxes fr
 that **confirm, never block**: simulate first, one clear confirm, then place. Render everything with
 `references/visual-kit.md` (capacity card, simulation card, confirm card).
 
+## 0. Just show me my infra (read-only, no order)
+If the user only wants to see what they have ("show my sending accounts", "how many inboxes do I have",
+"list my DFY orders"), run the reads and render, no simulation, no confirm, no spend:
+`list_accounts` (connected senders), `dfy_list_orders` (their DFY orders), `dfy_list_ordered_accounts`
+(mailboxes from those orders), and `warmup_analytics` for health when there is at least one account.
+Render a plain infra/inventory view; only move into a capacity check or an order if they ask.
+
 ## 1. Capacity check (read-only)
 - Count current senders: `list_accounts`. **If it returns zero accounts, warmed = 0, stop there, do NOT
   call `warmup_analytics`** (its body needs at least one email, so an empty call 400s). Otherwise check
