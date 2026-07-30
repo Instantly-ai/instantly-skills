@@ -99,6 +99,12 @@ Either way it verifies the key and saves it for you. Your key stays only on your
 this project, never in your command history, never seen by the assistant. That's the whole setup. No MCP
 server to register. Full walkthrough: [docs/quickstart.md](docs/quickstart.md).
 
+Removing or changing your key later? One command clears it from this computer (and tells you how to clear
+any leftover env-var copy):
+```bash
+node ~/.instantly-gtm/core/auth.mjs disconnect        # then reconnect with: setup --web
+```
+
 Requires Node 18+ (don't have it? the "ask Claude" option above installs it for you via nvm, no admin
 needed), an Instantly **paid plan**, and at least one connected, warmed sending account.
 

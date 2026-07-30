@@ -11,6 +11,10 @@ import { join } from 'node:path';
 
 export const ENV_VAR = 'INSTANTLY_API_KEY';
 export const KEYFILE_PATH = join(homedir(), '.instantly-gtm', 'key');
+// The shell profiles we read a key from (back-compat) and that `auth.mjs disconnect` strips it from.
+// `.zshenv` is included because a key exported there loads into every shell's env before `.zshrc`,
+// which is exactly the residual-env-var case cleanup must cover.
+export const PROFILE_FILES = ['.zshrc', '.zprofile', '.zshenv', '.bashrc', '.bash_profile', '.profile'];
 
 // Returns { key, source } — source is 'env' | 'keyfile' | 'profile:<file>' | null.
 export function resolveKey() {
@@ -24,7 +28,7 @@ export function resolveKey() {
   } catch { /* ignore unreadable keyfile */ }
 
   const home = homedir();
-  for (const f of ['.zshrc', '.zprofile', '.bashrc', '.bash_profile', '.profile']) {
+  for (const f of PROFILE_FILES) {
     try {
       const p = join(home, f);
       if (!existsSync(p)) continue;
