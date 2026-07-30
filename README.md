@@ -9,13 +9,16 @@ No MCP to register. The skills share one small CLI over the Instantly API: clone
 the skills you want. Works in Claude Code, Claude Desktop, and any bash-capable agent (Codex included).
 
 **In this collection**
-- **`instantly-gtm`** — the full cold-email outbound loop: find, verify, write, launch, replies, report. *(Skill #1.)*
+- **`instantly-gtm`** — the full cold-email outbound loop: find, verify, write, scale senders, launch, replies, report. *(Skill #1.)*
 - More Instantly skills will land here over time. Install only the ones you want.
 
 ## Why you'd want it
 - **The whole loop, end to end.** ICP to launched campaign to booked meetings, all from chat.
 - **Safe by design.** The guardrails below have no off switch (see [Why it's safe](#why-its-safe)).
 - **Sounds like you, not a bot.** It learns your business and your voice, and writes plain, spam-safe copy.
+- **Scale your sending from chat.** Out of inboxes or on a cold domain? It sizes the gap, shows your
+  current senders, and lets you buy pre-warmed Done-For-You mailboxes and domains from Instantly, right
+  here. It simulates the order first, places it only after you confirm, and never touches your payment.
 - **Won't break when the API changes.** Skills speak stable verbs; the real endpoints live in one map
   file, so a rename is a one-line patch, not a rewrite.
 - **Free and open (MIT).** Bring your own Instantly key. Nothing else to buy.
@@ -27,17 +30,20 @@ the skills you want. Works in Claude Code, Claude Desktop, and any bash-capable 
 Go from a plain-language ICP to a launched, verified campaign, then work the replies and read the
 results, without leaving your agent.
 
-## What it does (the 7-step loop)
+## What it does (the loop)
 1. **Find.** Turn "200 Series-A fintech VPs of Sales" into a SuperSearch, and see the count before you spend.
 2. **Enrich and verify.** Import, enrich, verify emails, and drop the ones that would bounce (non-negotiable).
 3. **Write.** Draft a sequence (subjects, bodies, follow-ups) in your voice, from your real offer.
 4. **Assemble.** Create the campaign as a **draft** with your leads and sequence attached.
-5. **Launch.** Preflight sender health, then activate **only after you confirm**, and never from a cold domain.
-6. **Replies.** Triage the inbox, set interest, draft responses, book meetings.
-7. **Report.** Pull the numbers, chart them, flag what's working, and suggest the one next change.
+5. **Scale senders.** Check whether you have enough warmed mailboxes for the volume. Short, or on a cold
+   domain? View your current infra, then simulate and buy pre-warmed Done-For-You mailboxes and domains
+   from Instantly, placed only after you confirm, and never touching your payment.
+6. **Launch.** Preflight sender health, then activate **only after you confirm**, and never from a cold domain.
+7. **Replies.** Triage the inbox, set interest, draft responses, book meetings.
+8. **Report.** Pull the numbers, chart them, flag what's working, and suggest the one next change.
 
-Run the whole loop ("run outbound for X") or jump to any single step ("any replies?", "why is
-campaign Y underperforming?").
+Run the whole loop ("run outbound for X") or jump to any single step ("do I have enough inboxes?",
+"any replies?", "why is campaign Y underperforming?").
 
 ## Why it's safe
 Guardrails that don't turn off:
