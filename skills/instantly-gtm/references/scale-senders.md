@@ -36,15 +36,18 @@ quick questions:
    pattern, not one address.
 2. **Which domain(s) do you already use?** These seed the look-alike suggestions in §4 so new domains
    match their brand.
+3. **Pre-warmed or fresh domains?** Pre-warmed are ready to send now (skip the 2–3 week warmup) but come
+   and go from stock; fresh domains are always available but need warmup. Ask their preference; if they
+   want pre-warmed and none are in stock, say so and offer fresh.
 Also capture provider (Google default) and an optional forwarding domain. Confirm briefly, persist via
 `save-profile.mjs`, and reuse next time (ask once, D-019). If the user would rather not specify, use a
 sensible default (first-name mailboxes; seed similars from their website domain if known) and tell them
 what you assumed, still don't invent silently.
 
 ## 4. Simulate the order (read-only, nothing bought)
-Build a grounded recommendation from the persona:
+Build a grounded recommendation from the persona and their §3 pre-warmed/fresh preference:
 - `dfy_prewarmed_domains` — in-stock pre-warmed domains (skip the 2–3 week warmup). Empty list is normal,
-  not an error; fall back to fresh domains.
+  not an error; if they wanted pre-warmed and there are none, say so and offer fresh.
 - `dfy_similar_domains` (`{domain, tlds}`) — seed it from the **domain(s) the user gave in §3** (their
   real brand), so suggestions look like theirs; fall back to their website/brand root only if none given.
 - `dfy_check_domains` (`{domains:[…]}`) — only show/offer domains that come back **available**.
@@ -52,13 +55,16 @@ Build a grounded recommendation from the persona:
 - Mailbox math (from the API, don't guess): **Google / AirMail = up to 5 mailboxes per domain** (billed
   per mailbox monthly); **Microsoft/Outlook = 50 per new domain** (billed per domain monthly). So for a
   Google plan, `domains = ceil(added_mailboxes ÷ 5)`.
-Render the **simulation card**: domains, mailboxes, provider, new capacity, clearly marked "Simulation,
-not placed". Nothing is bought here.
+Render the **simulation card** inline (per `references/visual-kit.md`, prefer inline + interactive):
+domains, mailboxes, provider, new capacity, clearly marked "Simulation, not placed". Nothing is bought
+here. Always offer the choices in text too ("reply place it / edit / wait for pre-warmed"), never rely on
+a button, and never make the user open a link to act.
 
 ## 5. Confirm → place (the one gate)
 `dfy_place_order` is **confirm-gated and has no auto-mode** (spend always confirms, like `enrich`). Show
-the confirm card first (mirrors the launch confirm): domains · mailboxes · provider · billed monthly ·
-uses your Instantly payment method. Only after an explicit yes, run:
+the confirm card (mirrors the launch confirm): domains · mailboxes · provider · billed monthly · uses your
+Instantly payment method. Place only after an explicit user action, a typed "place it" OR a card button
+that sends that message; a dead button is never the yes. Then run:
 `dfy_place_order --confirm --params '{"items":[{"domain":"…","email_provider":1,"forwarding_domain":"…","accounts":[…]}]}'`
 (`email_provider`: 1 Google, 2 AirMail, 3 Microsoft/Outlook; `accounts` = the mailbox usernames from the
 persona's naming pattern; `forwarding_domain` optional). Report what was placed and that it's billed

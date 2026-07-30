@@ -7,13 +7,30 @@ looks like one product. It is the layer over the loop; `conversation.md` sets th
 shapes.
 
 ## When to render vs. fall back
-- **Render** when the host surface supports rich output (an artifact / HTML / canvas / widget /
-  elicitation, e.g. Claude Desktop, claude.ai). Produce the visual with the tokens below.
-- **Fall back** to clean markdown (a tight table or the plain 5-move map) on a bare terminal. **Never emit
-  raw HTML into a plain terminal**, and never paste markup into chat as if it were rendering, that's noise.
-- **Unsure?** Offer "want this as a visual?" rather than dumping markup.
-- Rendering is **presentation only**. It never adds a verb, never sends, never spends. It shows the loop's
-  data; it never invents values to fill a card (render what's present, omit the rest).
+**Try UI first, and prefer inline + interactive.** Walk this ladder, top down, use the highest tier the
+host supports:
+1. **Inline + interactive (best).** If the host has a capability that renders HTML/SVG **inline in the
+   chat** AND lets a control send a message back to the conversation (a `sendPrompt`-style callback), use
+   it. Render the card inline and wire its buttons to send the exact next message ("place it", "edit",
+   "wait for pre-warmed"). A button click then IS an explicit user action the confirm gate accepts.
+2. **Inline, static.** If it renders inline but has no callback, render inline anyway; treat buttons as
+   decorative and drive the choice by the user's typed reply.
+3. **Published artifact / link (last resort).** Only if there's no inline path. **Never make the user
+   open a link to see or act, ** put the full info + the choices in the chat text too.
+4. **Plain text.** No render capability → clean markdown (a tight table). Never emit raw HTML into a
+   terminal, and never paste markup into chat as if it were rendering.
+
+**Confirm is always available in text.** A confirm-gated action (place order, launch, send, spend) runs
+only on an explicit user action, a typed reply OR a control that sends an explicit message. Buttons are
+never the ONLY path; always state the text option ("or just reply: place it / edit"). A dead button is
+never the gate.
+
+**Never leak design internals into chat.** Do not print design plans, hex/tokens, CSS, or
+tool/framework names, and do not narrate "let me render / choosing colors". Render silently, then give a
+one-line human summary of what's on the card. The chat stays about the outcome, not the styling.
+
+Rendering is **presentation only**. It never adds a verb, never sends, never spends; it shows the loop's
+data and never invents values to fill a card (render what's present, omit the rest).
 
 ## The components (compose from these, don't reinvent)
 - **Result card** — a bounded object (leads found, a campaign, a DFY preview). White surface, hairline
@@ -27,8 +44,10 @@ shapes.
 - **Status pill** — Live (success), Draft (ink-dark), Preview / Simulation (accent), Under capacity
   (warning), Refused / cold domain (danger).
 - **Confirm card** — the gate, made legible. Launch shows the four parts (N leads · sequence · daily ramp ·
-  sending domains); a DFY order shows domains · mailboxes · provider · billed-monthly. A primary action +
-  the "confirm once more" microcopy. It **gates on the explicit yes**, it never auto-proceeds.
+  sending domains); a DFY order shows domains · mailboxes · provider · billed-monthly. Its buttons send the
+  choice as a chat message where the host supports a callback ("place it" / "edit"); always also show the
+  text option ("or just reply place it"). It **gates on the explicit yes** (typed reply or a
+  message-sending control), never a dead button, and never auto-proceeds.
 - **Suggestion callout** — accent-tinted, one next action ("try cutting step 3, want me to draft it?").
   Analytics/infra **suggest**, they never act.
 - **Empty / error state** — the human reason + the next action (SPEC §8), never a raw dump.
