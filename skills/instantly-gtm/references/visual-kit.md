@@ -6,30 +6,25 @@ a card/metric/chart form. This file is the single source for that vocabulary so 
 looks like one product. It is the layer over the loop; `conversation.md` sets the voice, this sets the
 shapes.
 
-## Render INSIDE the chat message. Markdown first.
-The visual must appear in the chat, not in a side panel the user has to open. Key fact: Claude routes
-self-contained content over ~15 lines to the **Artifacts side panel**, so a big HTML card always leaves
-the chat; Claude Code (terminal) can't render HTML at all. The thing that reliably renders **in the
-message on every host is Markdown**. So:
-1. **Rich inline Markdown (default, always).** Build the card from Markdown: a titled table, a metric
-   row, a `▓▓▓░░` unicode bar, status as **bold**/`[label]`. Keep it tight (a small table + a few lines,
-   well under ~15) so it stays inline and never trips artifact routing.
-2. **Mermaid** for a funnel/diagram **only where the host renders it inline**; otherwise use the Markdown
-   funnel (it degrades to a code block if not rendered, so don't rely on it).
-3. **Genuine in-message interactive widget** (optional top tier) **only if** the host has a capability
-   that renders in the message itself (not a side panel) and can send a message back (`sendPrompt`-style),
-   then buttons may send the choice. Its absence means Markdown, never an artifact.
-4. **Plain text** if even Markdown tables aren't supported.
+## The visual is Markdown, with Mermaid for diagrams. No HTML, no artifacts.
+The visual must appear IN the chat message, on every host (including the Claude Code terminal). Two paths,
+nothing else:
+1. **Markdown (default, always).** Build the card from Markdown: a bold title + status, a small table of
+   the fields, a `▓▓▓░░` unicode bar, `- ` lists. Renders everywhere.
+2. **Mermaid** (a ` ```mermaid ` fenced block) for a funnel / flow / diagram, where the host renders it
+   inline. ALWAYS pair it with the Markdown version (a `▓▓▓░░` bar funnel), because some hosts show
+   mermaid as a code block.
 
-**Never auto-create a standalone / published artifact for these cards** (leads, capacity, DFY
-simulation/confirm, analytics, launch), and never invoke an artifact-creation path for them. An artifact
-opens off to the side, that is the exact failure we're avoiding. Artifacts are allowed ONLY when the user
-explicitly asks for a shareable, standalone page, never as the default for an ephemeral card.
+**Never emit HTML, and never create an artifact / published page / `.html` file for a visual** — not for
+leads, DFY, launch, capacity, a sequence draft, OR a report. Claude routes self-contained HTML (over ~15
+lines) to the side panel, the exact failure we're avoiding, and a sequence rendered as an `.html` file is
+the recurring bug. **Reports are no exception:** they render as stylized Markdown + a Mermaid funnel,
+inline. (An artifact is acceptable ONLY if the user explicitly asks for a standalone/shareable page, never
+as the default.)
 
 **Confirm is always available in text.** A confirm-gated action (place order, launch, send, spend) runs
-only on an explicit user action, a typed reply OR a control that sends an explicit message. Buttons are
-never the ONLY path; always state the text option ("or just reply: place it / edit"). A dead button is
-never the gate.
+only on an explicit **typed reply** ("place it", "launch it"). State the choices as text
+("reply place it to confirm, or edit to change"). There are no buttons, the visual is Markdown.
 
 **Never leak design internals into chat.** Do not print design plans, hex/tokens, CSS, or
 tool/framework names, and do not narrate "let me render / choosing colors". Render silently, then give a
@@ -54,8 +49,7 @@ data and never invents values to fill a card (render what's present, omit the re
 - **Confirm card** — the gate, made legible in Markdown. Launch shows the four parts (N leads · sequence ·
   daily ramp · sending domains); a DFY order shows domains · mailboxes · provider · billed-monthly. Then
   the choices as text: `Reply **place it** to confirm, **edit** to change, or **wait for pre-warmed**.`
-  It **gates on the explicit yes** (a typed reply, or an in-message control that sends it), never a dead
-  button, and never auto-proceeds.
+  It **gates on the explicit typed yes** and never auto-proceeds.
 - **Suggestion callout** — one next action as a plain line ("Suggested: cut step 3, it's where replies
   stall. Want me to draft that?"). Analytics/infra **suggest**, they never act.
 - **Empty / error state** — the human reason + the next action (SPEC §8), never a raw dump.
@@ -70,25 +64,11 @@ data and never invents values to fill a card (render what's present, omit the re
 - **Secrets** are never rendered. Connection shows workspace + last-4 only.
 
 ## Voice inside a visual
-Same as everywhere: dry operator, sentence case, no em dashes, no "!". **Icon boundary:** thin line icons
-(the Instantly/lucide style) are UI design elements and are fine inside a rendered component. The
-emoji/dingbat HARD STOP (✅⬜✓ etc.) in `conversation.md` is about **email and chat text copy**, not UI
-iconography. Don't put decorative emoji in copy; do use a clean line icon in a card header.
+Same as everywhere: dry operator, sentence case, no em dashes, no "!", no emoji/dingbats (the
+`conversation.md` HARD STOP applies here too). The polish comes from clean Markdown structure, headings,
+**bold** labels, tables, a `▓▓▓░░` bar, blockquotes, not from styling.
 
-## Design tokens (ONLY for a genuine in-message HTML widget, not the default)
-The default is Markdown, which has no styling, so these tokens do NOT apply to it. Use them only in the
-optional tier-3 case: a host capability that truly renders HTML in the message. Never emit a styled HTML
-page as an artifact for a card. Honor the brand fingerprint (full detail in the `instantly-ui` skill):
-```css
---brand:#006bff; --brand-soft:rgba(0,107,255,.12); --brand-active:#eef4ff;
---success:#2eca8b; --danger:#e43f52; --warning:#ffc107;
---ink:#202942; --ink-body:#3c4858; --ink-muted:#8492a6; --ink-faint:#adb5bd;
---surface:#fff; --sunken:#f8f9fc; --border:#e9ecef; --border-strong:#dee2e6;
-/* type: Averta -> fallback ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; 500 for headings/numbers/buttons */
-/* radius: cards 12px, controls/inputs 8px, pills 9999px */
-/* the identifiable action: solid brand fill + 1px same-color border + 0 3px 5px rgba(0,107,255,.3) glow */
-```
-Rules that keep it on-brand: borders over shadows, generous whitespace, one primary (brand) action per
-card, color = meaning (blue interactive, green positive, red attention, yellow upgrade/new, grey neutral).
-On a viewer with light/dark theming, keep text legible in both; when in doubt, prefer the light-first
-values above and let labels/contrast carry meaning.
+## No HTML, no CSS
+There is no styling layer. Markdown + Mermaid only. The brand shows through clear structure and plain
+labels, not colors or fonts. If you ever feel the urge to write `<div>`/`<style>` or open an artifact for
+a card, stop, that's the bug; render Markdown instead.

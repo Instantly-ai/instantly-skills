@@ -53,7 +53,9 @@ Voice governs phrasing; this governs STRUCTURE. Apply both.
 
 ## Output contract (this is the important part)
 Emit the sequence as a fenced `json` code block in the campaign sequence shape, plus a
-human-readable rendering above it. Exact shape (the orchestrator places this at `sequences[0]`):
+human-readable rendering above it. **The human-readable rendering is stylized Markdown** (a bold subject
+line, a blockquote for the email body, one block per step), **never an HTML file, an artifact, or a
+`.html` draft** (see `references/visual-kit.md`). Exact shape (the orchestrator places this at `sequences[0]`):
 
 ```json
 {
