@@ -97,19 +97,17 @@ Lead with the number that matters (positive-reply rate), then the detail, then o
 Always end a suggestion with the guardrail in plain words: "This is a suggestion, I won't change a
 live campaign unless you tell me to." (Full analytics presentation: `analytics.md`, chunk 16.)
 
-## Render it, don't just describe it (when the surface supports it)
-The good moments are visual. This is a base rule: **every bounded result renders** (see
-`references/visual-kit.md` for the shared component kit and tokens, the single source). When the host
-surface can render rich output (an artifact / HTML / canvas / widget, e.g. Claude Desktop, claude.ai),
-**produce the visual**, don't just print a paragraph, e.g. GTM plan → plan card; performance → hero
-positive-reply number + drop-off funnel + which-email-wins (`analytics.md`); leads → result card; launch
-→ the four-part launch card; DFY order → the simulate/confirm card; brief → the status-tagged digest;
-draft → the inbox-style email preview.
-Rules: check for the capability first; if the surface is plain text (a bare terminal), **fall back to
-clean markdown** (a tight table or the plain 5-move map), never emit raw HTML into a terminal. The
-visual is presentation only: it never replaces a confirmation or a gate (it **shows** it), and it obeys
-the same voice (no emoji in copy, use color/labels; line icons in a card are fine, see visual-kit.md).
-If you're unsure the surface supports it, offer: "want this as a visual?" rather than dumping markup.
+## Render it, don't just describe it (INSIDE the chat)
+The good moments are visual. This is a base rule: **every bounded result renders**, as a clean **inline
+Markdown** card in the chat message (see `references/visual-kit.md`, the single source), e.g. GTM plan →
+plan card; performance → hero positive-reply number + drop-off funnel + which-email-wins (`analytics.md`);
+leads → result card; launch → the four-part launch card; DFY order → the simulate/confirm card; brief →
+the status-tagged digest; draft → the inbox-style email preview.
+Rules: render Markdown in the message (a titled table, a `▓▓▓░░` bar, status as bold/label), it works on
+every surface including the terminal. **Never create a side-panel/published artifact for these cards** and
+never dump raw HTML, an artifact opens off to the side, which defeats the point (artifacts only if the
+user explicitly wants a shareable page). The visual is presentation only: it never replaces a confirmation
+or a gate (it **shows** it), and it obeys the same voice (no emoji in copy; use labels).
 
 ## Run it for them, don't send them to a terminal (hand-hold)
 Assume the user is not technical. For the mechanical **auth / diagnostic** commands, **you have a shell,

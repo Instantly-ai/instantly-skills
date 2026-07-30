@@ -80,9 +80,25 @@ When unsure, choose the plainer wording. Examples (pattern, not a script):
 - "Act now, limited spots!" → "worth a look if you're planning Q3 outbound?"
 - "I guarantee results" → "happy to show you what worked for <similar company>"
 
+## 5. Pattern-level kill list (ban the category, not just the phrase)
+A phrase blocklist gets paraphrased around (ban "tips" and it ships "the 3 things I spotted"). So kill
+these PATTERNS wherever they appear, however they're worded. Rewrite direction, not just deletion:
+- **Tease-and-offer** — offering to send/share something you "found / noticed / spotted / put together"
+  (any noun, any count). → Make the observation itself the value; if there's a real asset, offer it on a
+  later touch (the CTA ladder in `sequence-playbook.md`), never email 1.
+- **Passive closes** — "no pressure if it's not relevant", "if that's helpful", "just thought I'd reach
+  out". → End on a real question the reader can answer in one line.
+- **Opening with tactical advice** — dispensing tips in email 1. → Open with an observation about them
+  (the observation test in the sequence-writer module).
+- **Product stats too early** — any metric/claim about your product before the reader has engaged.
+  → Email 1 is about their world, not your numbers; hold proof to a later touch.
+- **Naming a competitor** as bait or comparison. → Describe the situation, not the rival.
+- **Claiming a specific company is a customer** you can't verify / name-dropping a logo. → Generic peer
+  framing only ("teams running their own outbound", never "we work with <Named Co>").
+
 ## How it's applied
-- **Step 3:** the sequence-writer runs this as part of its pre-handoff self-check; flagged lines are
-  rewritten before the draft is shown.
+- **Step 3:** the sequence-writer runs this (phrase + pattern lists) as part of its pre-handoff
+  self-check; flagged lines are rewritten before the draft is shown.
 - **Step 5:** a final scan at launch preflight; anything hype-y surfaces in the confirm summary.
 - **Exceptions:** if the user insists a flagged word is on-brand, note the approved exception for the
   session and stop flagging it. Judgment over dogma, the goal is inbox placement, not word-policing.
