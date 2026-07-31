@@ -37,16 +37,50 @@ enrichment or the agent produced one; otherwise fall back to role-pain.
 - Final step is a genuine break-up; it often gets the most replies.
 - Spintax/heavy templating is out for v1, clarity over cleverness.
 
-## Worked example 1: SaaS → Series-A fintech VP of Sales (3-step)
-- **E1** subject: `quick question about {{companyName}}`, "Hi {{firstName}}, noticed {{companyName}}
-  raised its Series A, usually means the sales team is scaling fast. We helped <similar co> cut new-rep
-  ramp from 90 to 30 days. Worth a quick look?" (delay 3d)
-- **E2** subject: `` (threads), "Following the note above, the ramp problem tends to bite right after
-  a raise. Happy to send the 1-page breakdown of how <similar co> did it. Want it?" (delay 4d)
-- **E3** subject: ``, "Should I close the loop on this, {{firstName}}? No worries if the timing's off."
+## Subject craft
+Engineer the subject to look non-marketing: lowercase, a 2–4 word fragment, zero sales words (a
+first-name prefix like `{{firstName}} - quick one` reads personal). Follow-ups carry NO subject so they
+thread onto email 1 (continuity + deliverability). The subject's only job is to not look like an ad.
 
-## Worked example 2: agency → ecommerce founder (4-step value ladder)
-Problem (rising CAC) → Proof (a comparable brand's result) → New angle (a free teardown) → Breakup.
-Keep each under the length bands above; CTA escalates from "worth a look?" to a concrete offer.
+## Framework shapes (pick one, don't default to mush)
+Choose the shape that fits the pain, then write to it:
+| If the pain is… | Shape | The move |
+|---|---|---|
+| Quantifiable, ops buyer | Do the Math | trigger → back-of-napkin cost → CTA |
+| You hold real intel | Permissionless Value | hand over the intel, no pitch |
+| Founder pitched constantly | Ask Before Pitch | the question IS the CTA |
+| High-volume SMB | Short Trigger | under ~30 words, soft close |
+| Known industry-wide pain | Challenge of Similar Cos | "teams like yours hit X" (generic, never a named customer) |
+
+## Cold CTA ladder (interest before calendar)
+At the cold stage, interest asks out-pull calendar asks, so climb, don't lead with a meeting:
+| Touch | Job | CTA |
+|---|---|---|
+| E1 | the observation (most of the effort) | soft interest ("worth exploring?"), no link |
+| E2 | a NEW angle question, not a bump | still interest |
+| E3 | offer the asset (only now) | "want me to send it?" |
+| E4 | first calendar ask, link appears | the meeting (real booking link, or "reply to this email") |
+| E5 | binary break-up | "1, 2, or 3?" |
+Cap at ~5. Meeting-first still governs warm/reply stages; this ladder is the cold-stage exception.
+
+## Proof discipline
+Specificity = THEIR world, not your stats. Hold product proof to a later touch, framed as a pattern
+("what we see across teams"), never a promise, a competitor's name, or a claim that a named company is a
+customer. Anti-guarantee reads more credible than a guarantee ("nothing can guarantee X, here's what we
+do about it").
+
+## Worked example 1: SaaS → Series-A fintech VP of Sales (3-step)
+- **E1** subject: `{{firstName}} - quick one`, "Hi {{firstName}}, noticed {{companyName}} just raised,
+  which usually means reps get hired faster than they can ramp. Curious how you're handling that stretch,
+  worth exploring?" (observation, no product claim; delay 3d)
+- **E2** subject: `` (threads), "Following on, the ramp gap tends to bite hardest in a new rep's first 60
+  days. How are you getting them productive today?" (new angle, still interest; delay 4d)
+- **E3** subject: ``, "Last note from me, {{firstName}}, is fixing rep ramp a this-quarter thing or not
+  right now?" (clean binary break-up, no passive close)
+
+## Worked example 2: agency → ecommerce founder (4-step ladder)
+E1 observation (their CAC math, no product claim) → E2 new-angle question → E3 offer a short teardown
+("want me to send it?") → E4 clean binary break-up. Interest first; a calendar link only if it reaches a
+meeting ask. Keep each under the length bands above.
 
 > These examples are patterns to adapt to the user's real offer and voice, never send them verbatim.

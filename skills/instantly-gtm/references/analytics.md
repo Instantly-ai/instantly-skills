@@ -34,13 +34,13 @@ sent** ABOVE vanity metrics. Positive comes from `analytics_overview` (`total_in
 - Bounce < 3% is fine; **> 5% = stop and clean** the list/domains.
 - A high raw reply rate that's mostly "not interested"/"unsubscribe" is a bad sign, not a good one.
 
-## Charts (the HOST agent renders them: the skill supplies the data)
-**When the surface supports rich rendering (artifact / HTML / canvas), BUILD the visual report**, the
-hero number, funnel, and step-contribution as an actual rendered dashboard, not a described one (see
-`conversation.md` → "Render it, don't just describe it"). On a plain-text surface, fall back to a clean
-markdown table + the plain map, never dump raw HTML into a terminal. Don't build charting into the
-skill; use the host's capability. Lead with the number that matters, then the shape, then one flat
-suggestion (voice: `conversation.md`).
+## Charts (stylized Markdown + Mermaid, in the chat)
+Render the report as stylized **Markdown** in the message: a big bold hero number, a small metric table,
+and the drop-off funnel as `▓▓▓░░` bars. Use a **Mermaid** flowchart for the funnel where the host renders
+it inline, always with the Markdown bar version alongside (some hosts show mermaid as a code block).
+**Never build an HTML dashboard or an artifact for a report** (see `references/visual-kit.md`), inline
+Markdown + Mermaid only. Lead with the number that matters, then the shape, then one flat suggestion
+(voice: `conversation.md`).
 
 **The report layout (in this order):**
 1. **Hero, positive-reply rate.** The north-star as one large number + a small trend sparkline

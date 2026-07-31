@@ -9,13 +9,16 @@ No MCP to register. The skills share one small CLI over the Instantly API: clone
 the skills you want. Works in Claude Code, Claude Desktop, and any bash-capable agent (Codex included).
 
 **In this collection**
-- **`instantly-gtm`** — the full cold-email outbound loop: find, verify, write, launch, replies, report. *(Skill #1.)*
+- **`instantly-gtm`** — the full cold-email outbound loop: find, verify, write, scale senders, launch, replies, report. *(Skill #1.)*
 - More Instantly skills will land here over time. Install only the ones you want.
 
 ## Why you'd want it
 - **The whole loop, end to end.** ICP to launched campaign to booked meetings, all from chat.
 - **Safe by design.** The guardrails below have no off switch (see [Why it's safe](#why-its-safe)).
 - **Sounds like you, not a bot.** It learns your business and your voice, and writes plain, spam-safe copy.
+- **Scale your sending from chat.** Out of inboxes or on a cold domain? It sizes the gap, shows your
+  current senders, and lets you buy pre-warmed Done-For-You mailboxes and domains from Instantly, right
+  here. It simulates the order first, places it only after you confirm, and never touches your payment.
 - **Won't break when the API changes.** Skills speak stable verbs; the real endpoints live in one map
   file, so a rename is a one-line patch, not a rewrite.
 - **Free and open (MIT).** Bring your own Instantly key. Nothing else to buy.
@@ -27,17 +30,20 @@ the skills you want. Works in Claude Code, Claude Desktop, and any bash-capable 
 Go from a plain-language ICP to a launched, verified campaign, then work the replies and read the
 results, without leaving your agent.
 
-## What it does (the 7-step loop)
+## What it does (the loop)
 1. **Find.** Turn "200 Series-A fintech VPs of Sales" into a SuperSearch, and see the count before you spend.
 2. **Enrich and verify.** Import, enrich, verify emails, and drop the ones that would bounce (non-negotiable).
 3. **Write.** Draft a sequence (subjects, bodies, follow-ups) in your voice, from your real offer.
 4. **Assemble.** Create the campaign as a **draft** with your leads and sequence attached.
-5. **Launch.** Preflight sender health, then activate **only after you confirm**, and never from a cold domain.
-6. **Replies.** Triage the inbox, set interest, draft responses, book meetings.
-7. **Report.** Pull the numbers, chart them, flag what's working, and suggest the one next change.
+5. **Scale senders.** Check whether you have enough warmed mailboxes for the volume. Short, or on a cold
+   domain? View your current infra, then simulate and buy pre-warmed Done-For-You mailboxes and domains
+   from Instantly, placed only after you confirm, and never touching your payment.
+6. **Launch.** Preflight sender health, then activate **only after you confirm**, and never from a cold domain.
+7. **Replies.** Triage the inbox, set interest, draft responses, book meetings.
+8. **Report.** Pull the numbers, chart them, flag what's working, and suggest the one next change.
 
-Run the whole loop ("run outbound for X") or jump to any single step ("any replies?", "why is
-campaign Y underperforming?").
+Run the whole loop ("run outbound for X") or jump to any single step ("do I have enough inboxes?",
+"any replies?", "why is campaign Y underperforming?").
 
 ## Why it's safe
 Guardrails that don't turn off:
@@ -47,7 +53,7 @@ Guardrails that don't turn off:
 - **Cold domains are refused.** It warns and stops rather than burning an un-warmed sender.
 - **Analytics only suggests.** It never changes a campaign on its own.
 - **Spend is gated.** Anything that costs credits (enrichment) asks first.
-- **No destructive actions, ever.** The CLI has no endpoint for delete, billing, or purchase, so they can't run.
+- **No destructive actions, and no surprise purchases.** The CLI has no endpoint for deletes, account changes, or billing. The one thing it can buy is DFY sending accounts, and only after it shows you a simulation and you explicitly confirm; it never enters payment details (Instantly's payment method is the gate). Everything else, including cancellations, you do in the app.
 - **Your key stays on your machine.** Saved to a private file only you can read (plus your shell profile), never in this repo, never in your command history, and never seen by the assistant.
 
 Prefer speed? Turn on **auto mode** per action (replies, interest, campaign edits) to skip the prompt.
@@ -98,6 +104,12 @@ node ~/.instantly-gtm/core/auth.mjs setup --persist   # paste your key into a hi
 Either way it verifies the key and saves it for you. Your key stays only on your own computer, never in
 this project, never in your command history, never seen by the assistant. That's the whole setup. No MCP
 server to register. Full walkthrough: [docs/quickstart.md](docs/quickstart.md).
+
+Removing or changing your key later? One command clears it from this computer (and tells you how to clear
+any leftover env-var copy):
+```bash
+node ~/.instantly-gtm/core/auth.mjs disconnect        # then reconnect with: setup --web
+```
 
 Requires Node 18+ (don't have it? the "ask Claude" option above installs it for you via nvm, no admin
 needed), an Instantly **paid plan**, and at least one connected, warmed sending account.

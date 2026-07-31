@@ -21,4 +21,8 @@
 - **Do / Don't:** plain and factual; no filler openers; never oversell
 
 ## Learned rules (auto-appended over time: most recent first)
-<!-- e.g. 2026-07-20: shorter replies, no exclamation marks (from user edit) -->
+<!-- The self-iterating voice + copy-rules store: every user edit or stated preference is distilled here
+     and applied to future drafts (tone AND angle/framework/subject preferences). Most recent first.
+     e.g. 2026-07-20: shorter replies, no exclamation marks (from user edit)
+          2026-07-22: keep subjects statement-style, no questions (from user edit)
+          2026-07-24: prefers the "do the math" angle for ops buyers (chosen angle) -->

@@ -12,6 +12,8 @@
     "add_leads", "list_leads", "get_lead",
     "create_campaign", "update_campaign", "get_campaign", "list_campaigns",
     "sending_status", "warmup_analytics", "test_vitals", "list_accounts", "activate",
+    "dfy_check_domains", "dfy_similar_domains", "dfy_prewarmed_domains",
+    "dfy_list_orders", "dfy_list_ordered_accounts", "dfy_place_order",
     "list_replies", "get_reply", "count_unread", "send_reply", "set_interest", "mark_read",
     "analytics", "analytics_overview", "analytics_steps", "analytics_daily",
     "get_background_job", "list_background_jobs"
@@ -21,6 +23,7 @@
     { "suffix": "write-sequence",    "description": "Draft a cold-email sequence in your voice (step 3)." },
     { "suffix": "launch-campaign",   "description": "Assemble a draft and launch it safely (steps 4-5)." },
     { "suffix": "triage-replies",    "description": "Triage the inbox, draft responses, book meetings (step 6)." },
-    { "suffix": "check-performance", "description": "Pull analytics, chart, and suggest the next change (step 7)." }
+    { "suffix": "check-performance", "description": "Pull analytics, chart, and suggest the next change (step 7)." },
+    { "suffix": "scale-senders",     "description": "View your sending accounts/DFY orders, check capacity, and buy DFY mailboxes/domains (simulate then confirm)." }
   ]
 }

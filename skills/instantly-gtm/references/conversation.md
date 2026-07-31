@@ -97,34 +97,44 @@ Lead with the number that matters (positive-reply rate), then the detail, then o
 Always end a suggestion with the guardrail in plain words: "This is a suggestion, I won't change a
 live campaign unless you tell me to." (Full analytics presentation: `analytics.md`, chunk 16.)
 
-## Render it, don't just describe it (when the surface supports it)
-The good moments are visual. When the host surface can render rich output (an artifact / HTML / canvas, 
-e.g. Claude Desktop, claude.ai), **produce the visual**, don't just print a paragraph:
-- **GTM plan** → a one-page plan card (Target · Angle · Cadence · Goal).
-- **Performance** → the hero positive-reply number → drop-off funnel → which-email-wins (see `analytics.md`).
-- **Launch** → the four-part launch card. **Brief** → the status-tagged digest.
-- **Draft** → the inbox-style email preview.
-Rules: check for the capability first; if the surface is plain text (a bare terminal), **fall back to
-clean markdown** (a tight table or the plain 5-move map), never emit raw HTML into a terminal. The
-visual is presentation only: it never replaces a confirmation or a gate, and it obeys the same voice
-(no emoji even in a chart, use color/labels). If you're unsure the surface supports it, offer:
-"want this as a visual?" rather than dumping markup.
+## Render it, don't just describe it (INSIDE the chat)
+The good moments are visual. This is a base rule: **every bounded result renders**, as a clean **inline
+Markdown** card in the chat message (see `references/visual-kit.md`, the single source), e.g. GTM plan →
+plan card; performance → hero positive-reply number + drop-off funnel + which-email-wins (`analytics.md`);
+leads → result card; launch → the four-part launch card; DFY order → the simulate/confirm card; brief →
+the status-tagged digest; draft → the inbox-style email preview.
+Rules: render Markdown in the message (a titled table, a `▓▓▓░░` bar, status as bold/label), it works on
+every surface including the terminal. **Never create a side-panel/published artifact for these cards** and
+never dump raw HTML, an artifact opens off to the side, which defeats the point (artifacts only if the
+user explicitly wants a shareable page). The visual is presentation only: it never replaces a confirmation
+or a gate (it **shows** it), and it obeys the same voice (no emoji in copy; use labels).
 
-## Handing the user a command (assume they are not technical)
-A bare command with no "where" makes people freeze. Every time you give one:
-- Say WHERE to run it: "open your Terminal (Mac: press Cmd+Space, type Terminal, press Enter; Windows:
-  open PowerShell)."
-- Reassure on the folder: these commands use full paths, so it does not matter which folder they are in
-  (no `cd` needed). Say that, so they do not wonder.
-- One command at a time. In a few words, say what it does and what "worked" looks like.
+## Run it for them, don't send them to a terminal (hand-hold)
+Assume the user is not technical. For the mechanical **auth / diagnostic** commands, **you have a shell,
+so run them yourself and narrate** ("opening the connect page in your browser now"), instead of handing a
+command to type. This covers: connect / change key (`setup --web`), remove key (`disconnect`), health
+(`doctor` / `status`), and auto-mode (`config get`).
+- **Additive / safe** (`setup --web`, `doctor`, `status`, `config get`) → just run them on request.
+- **`disconnect`** deletes the key and logs the skill out, so **confirm intent first** ("this removes your
+  key from this computer and logs the skill out, want me to?"), then run it. No terminal either way, but
+  never silent.
+- **The key stays yours.** `setup --web` opens the browser and the user pastes the key there; you never
+  see, type, or store it. Give the plain security "why": the key is a secret, stored only on their own
+  computer, never in the project or your context, never in command history.
+- **Scope stops here.** This is only auth/diagnostic tooling. It does NOT mean you auto-run the
+  confirm-gated capability verbs, `enrich`, `enrich_run`, `activate`, `update_campaign`, `send_reply`,
+  `set_interest`, `dfy_place_order` still need an explicit "yes" per action.
 
-**API-key setup specifically:** prefer the guided one-liner
-`node __INSTANTLY_CORE__/auth.mjs setup --persist` — they paste the key into a hidden prompt and it
-verifies and saves it for them (no editor, no history leak). Give the plain security "why": the key is a
-secret, like a password; it is stored only in their own computer's shell profile, never in the project or
-anywhere you can read, never in their command history, and you never see or type it. End with: "once it
-says Connected, open a new chat and ask me to check the status." (Offer the manual edit only if they
-prefer the skill never write anything.)
+**What each does (narrate briefly):** `setup --web` opens a browser page, they paste the key, it verifies
+and saves, then "open a new chat and I'll be connected." `disconnect` clears the local copies (key file +
+profile line), never prints the key, and if a copy is still loaded in the terminal it surfaces the exact
+`unset` fix; to fully revoke they delete it in the Instantly app; to rotate, disconnect then `setup --web`.
+
+**Fallback, when you can't run it for them** (no shell, or the shell isn't on their machine): then hand the
+command, and make it painless, say WHERE ("open Terminal, Mac: Cmd+Space, type Terminal, Enter; Windows:
+PowerShell"), reassure it runs from any folder (full paths, no `cd`), one command at a time, and say what
+"worked" looks like. `setup --web` also self-fallbacks: if the browser won't open it prints a
+`http://127.0.0.1:…` link to click.
 
 ## Never let voice soften a gate
 Draft-first, verify, cold-domain refusal, launch confirm, analytics-suggests, key-safety hold in every

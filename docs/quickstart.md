@@ -51,6 +51,11 @@ history, and never seen by the assistant. With `--web` it goes straight from you
 file on your machine. Want to place it by hand instead? Run `auth.mjs setup` (no flag) and it prints the
 exact line to add to `~/.zshrc`.
 
+**Remove or change it later:** `node ~/.instantly-gtm/core/auth.mjs disconnect` clears the key from this
+computer (key file + profile line) and, if a copy is still loaded in your terminal, tells you the exact
+`unset` fix. It only removes local copies; to fully revoke, delete the key in the Instantly app. Reconnect
+with `setup --web`.
+
 ## 3. One-time onboarding (recommended)
 Tell the skill your website ("set me up, my site is acme.com"). It reads the site, asks a couple of
 questions, and builds your business profile in `~/.instantly-gtm/profile/` (company, ICP, personas,

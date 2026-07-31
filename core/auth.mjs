@@ -11,6 +11,8 @@
 //                                          #   profile (~/.zshrc etc.) so it persists. One command, no editor.
 //   node scripts/auth.mjs setup --web     # browser flow: opens a local page, you paste the key there,
 //                                          #   it verifies + saves. No terminal typing, key never in chat (D-038).
+//   node scripts/auth.mjs disconnect      # remove the key from this computer (keyfile + profile line);
+//                                          #   reports any still-loaded env var + how to clear it. Never prints the key.
 //   node scripts/auth.mjs verify          # just verify the current env key
 //   node scripts/auth.mjs --check         # read a key from stdin (hidden), verify it, store NOTHING
 // The --persist mode is the ONLY path where auth.mjs writes the key, and only to the user's own shell
@@ -20,11 +22,11 @@
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
 import { randomBytes } from 'node:crypto';
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolveKey, KEYFILE_PATH } from './key.mjs';
+import { resolveKey, KEYFILE_PATH, PROFILE_FILES } from './key.mjs';
 
 const API_BASE = 'https://api.instantly.ai/api/v2';
 const KEYS_URL = 'https://app.instantly.ai/app/settings/integrations';
@@ -39,7 +41,7 @@ const WEB_TIMEOUT_MS = 5 * 60 * 1000;            // never leave a loopback liste
 const SCOPES_HINT = [
   'campaigns:all', 'leads:all', 'lead_lists:all', 'emails:all',
   'email_verifications:all', 'accounts:read', 'supersearch_enrichments:all',
-  'background-jobs:read', 'workspaces:read',
+  'background-jobs:read', 'workspaces:read', 'dfy_email_account_orders:all',
 ];
 
 const last4 = (k) => (k && k.length >= 4 ? `••••${k.slice(-4)}` : '••••');
@@ -344,6 +346,57 @@ async function cmdWeb() {
   }, WEB_TIMEOUT_MS).unref();
 }
 
+// Remove the key from this computer: the chmod-600 keyfile and the export line in the shell profiles
+// (the exact places `persistKey` writes). The inverse of connect. Never reads or prints the key value,
+// it matches by the variable NAME / keyfile PATH only. A child process cannot unset a key already loaded
+// into the parent shell's environment, so that copy is detected and the user is told how to clear it.
+function cmdDisconnect() {
+  const home = homedir();
+  const COMMENT = '# Instantly API key (added by instantly-gtm)';
+  const removed = [];
+  const warns = [];
+
+  // 1. The dedicated key file.
+  try {
+    if (existsSync(KEYFILE_PATH)) { unlinkSync(KEYFILE_PATH); removed.push(`the key file (${KEYFILE_PATH})`); }
+  } catch (e) { warns.push(`could not remove ${KEYFILE_PATH} (${e.code || e.message}); delete it by hand.`); }
+
+  // 2. The export line in each known shell profile (match by name, never print the value).
+  for (const f of PROFILE_FILES) {
+    const p = join(home, f);
+    let content;
+    try { if (!existsSync(p)) continue; content = readFileSync(p, 'utf8'); }
+    catch (e) { warns.push(`could not read ~/${f} (${e.code || e.message}).`); continue; }
+    if (!/INSTANTLY_API_KEY/.test(content) && !content.includes(COMMENT)) continue;
+    const kept = content.split('\n').filter((line) => !/INSTANTLY_API_KEY/.test(line) && line.trim() !== COMMENT);
+    try { writeFileSync(p, kept.join('\n')); removed.push(`the export line in ~/${f}`); }
+    catch (e) { warns.push(`could not update ~/${f} (${e.code || e.message}); remove the INSTANTLY_API_KEY line by hand.`); }
+  }
+
+  // 3. Report what changed (never the key itself).
+  const envStillSet = !!process.env[ENV_VAR];
+  if (!removed.length && !warns.length && !envStillSet) {
+    process.stdout.write('Already disconnected. No Instantly key found on this computer.\n');
+    process.exit(0);
+  }
+  process.stdout.write(removed.length ? `Removed: ${removed.join(', ')}.\n` : 'No key file or profile line to remove.\n');
+  for (const w of warns) process.stderr.write(`(warn: ${w})\n`);
+
+  // 4. The one thing a child process can't do: unset the parent shell's already-loaded env var.
+  if (envStillSet) {
+    if (process.platform === 'win32') {
+      process.stdout.write(`One copy is still set in your environment. Clear it with:  setx ${ENV_VAR} ""  then open a new terminal (or remove it under System > Environment Variables).\n`);
+    } else {
+      process.stdout.write(`One copy is still loaded in this terminal. Clear it with:  unset ${ENV_VAR}  (or just open a new terminal).\n`);
+    }
+  }
+
+  // 5. Local only, name the limit + the way back.
+  process.stdout.write(`\nThis removes local copies only. To fully revoke the key, delete it in Instantly: ${KEYS_URL}\n`);
+  process.stdout.write(`Reconnect any time:  node "${SELF}" setup --web\n`);
+  process.exit(0);
+}
+
 async function main() {
   const cmd = process.argv[2] || 'status';
   const persist = process.argv.includes('--persist');
@@ -356,8 +409,9 @@ async function main() {
     case 'verify': return cmdStatus({ verifyOnly: true });
     case 'setup': cmdSetup(); return;
     case 'check': return cmdCheck();
+    case 'disconnect': return cmdDisconnect();
     default:
-      process.stderr.write(`Unknown command "${process.argv[2]}". Use: status | setup | setup --web | setup --persist | verify | --check\n`);
+      process.stderr.write(`Unknown command "${process.argv[2]}". Use: status | setup | setup --web | setup --persist | disconnect | verify | --check\n`);
       process.exit(1);
   }
 }
