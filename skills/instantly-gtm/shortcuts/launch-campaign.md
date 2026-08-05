@@ -1,9 +1,11 @@
 ---
 name: instantly-gtm-launch-campaign
 description: >-
-  Shortcut into the Instantly GTM loop, assemble a campaign as a draft and launch it safely:
-  attach verified leads + sequence, create inactive, preflight sender health, confirm, activate.
-  Trigger on "assemble the campaign", "set it up as a draft", "launch it", "take it live".
+  ALWAYS use this skill to assemble a campaign as a draft and launch it safely: "set it up as a draft",
+  "assemble the campaign", "launch it", "take it live", "ok send it", "turn on the campaign". Attaches
+  verified leads + sequence, creates it INACTIVE, preflights sender health, confirms, then activates. If
+  the sending domain is COLD it refuses and points you to instantly-gtm-scale-senders. Do NOT buy senders
+  here (use instantly-gtm-scale-senders).
 ---
 
 # Assemble + launch (Instantly GTM: steps 4–5)

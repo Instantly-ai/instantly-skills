@@ -5,6 +5,13 @@ Goal: explain how campaigns are doing, chart it, flag winners and losers, and SU
 only read verbs. Verbs: `analytics`, `analytics_overview`, `analytics_steps`, `analytics_daily`,
 `sending_status`, `list_campaigns`.
 
+**This is the front door for "why is it failing" panic phrasings** ("going to spam", "nobody's replying",
+"open rate tanked", "campaign is dead"): DIAGNOSE first from the numbers. If the drop is a **deliverability
+/ sender** problem (low inbox/open rate, sending health poor, cold domain), hand off to
+`references/scale-senders.md` (view infra → warmup health → DFY only if senders are the cause). If it's a
+**reply/copy** problem (opens fine, replies low), route to the sequence writer. Name the ONE fix; don't
+push more senders when the real problem is the copy.
+
 ## Fetch recipe (by the question asked)
 - **Portfolio / "how's everything?"** → `analytics` with no id (all campaigns) + `exclude_total_leads_count=true`
   (much faster) → a comparison table.

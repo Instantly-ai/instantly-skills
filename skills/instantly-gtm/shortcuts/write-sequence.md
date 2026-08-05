@@ -1,9 +1,11 @@
 ---
 name: instantly-gtm-write-sequence
 description: >-
-  Shortcut into the Instantly GTM loop, write a cold-email sequence: subject lines, bodies,
-  follow-ups, and timing, in the user's voice, emitted in campaign shape. Trigger on "write a cold
-  email", "write a sequence", "draft outreach", "follow-ups".
+  ALWAYS use this skill to write COLD outbound copy, a sequence, subject lines, body, follow-ups, or
+  timing: "write a cold email", "draft a sequence", "need better subject lines", "make my emails less
+  spammy", "rewrite this sequence, it's too long", "draft outreach". Writes in the user's voice and runs
+  a spam-safe check. This is COLD-SEQUENCE copy: to reply to an INBOUND email use
+  instantly-gtm-triage-replies, not this. Do NOT launch (use instantly-gtm-launch-campaign).
 ---
 
 # Write a sequence (Instantly GTM: step 3)

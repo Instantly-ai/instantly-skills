@@ -1,9 +1,11 @@
 ---
 name: instantly-gtm-find-leads
 description: >-
-  Shortcut into the Instantly GTM loop, find leads and get them ready to email: turn a plain-language
-  ICP into SuperSearch filters, preview + count before spending, enrich, and verify (dropping
-  unverifiable rows). Trigger on "find leads", "build a prospect list", "who should I target".
+  ALWAYS use this skill to build a prospect list from a plain-language ICP: "find agency owners in the
+  US", "who should I target", "get me 200 more like these", "build a list of fintech VPs", "I need more
+  people to contact". Turn the ICP into SuperSearch filters, preview + count before spending, enrich, and
+  verify (drop unverifiable rows). This is COLD-EMAIL prospecting (verify/enrich for email), not phone or
+  cold-calling lists. Do NOT write the sequence (use instantly-gtm-write-sequence).
 ---
 
 # Find leads (Instantly GTM: steps 1–2)

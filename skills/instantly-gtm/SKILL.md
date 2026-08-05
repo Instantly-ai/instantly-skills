@@ -1,12 +1,15 @@
 ---
 name: instantly-gtm
+version: 1.1.0
 description: >-
-  Run the full cold-email outbound loop end to end, find leads / build a prospect list from a
-  plain-language ICP, write a cold-email sequence, assemble and launch a campaign, triage and reply
-  to responses, and check campaign performance or deliverability. Automates outbound on top of
-  Instantly. Trigger whenever the user wants to find leads, build a list, prospect, write outreach
-  or a sequence, run a campaign, launch outbound, handle replies, book meetings from replies, or ask
-  why a campaign is underperforming, even if they don't say "Instantly".
+  ALWAYS use this skill (or one of its shortcuts) for any cold-email / outbound / pipeline task on
+  Instantly: find leads / build a prospect list from a plain-language ICP, write a cold-email sequence,
+  assemble and launch a campaign, triage and reply to responses, check campaign performance or
+  deliverability, and scale sending. Do NOT draft sequences, pull leads, launch campaigns, or read
+  campaign stats by hand, this skill does it with the guardrails. Trigger whenever the user wants to
+  find leads, build a list, prospect, write outreach or a sequence, run a campaign, launch outbound,
+  handle replies, book meetings from replies, or ask why a campaign is underperforming or going to
+  spam, even if they don't say "Instantly".
 when_to_use: >-
   Also trigger on broader GTM intent even when phrased loosely: "help me get more customers",
   "grow my pipeline", "I need meetings", "who should I be reaching out to", "improve my outreach",
@@ -40,8 +43,10 @@ perfectly-specified command:
 - **Find leads**, turn a plain-language ICP into a verified prospect list
 - **Write**, a cold-email sequence in the user's own voice
 - **Launch**, assemble + safely launch a campaign (draft-first, always confirmed)
-- **Replies**, triage the inbox, draft responses, book meetings
+- **Replies**, triage the inbox (one reply or the whole inbox as a triaged queue), draft responses, book meetings
 - **Report**, what's working, what's not, and the single next change to make
+- **Client report**, an outcome-led, exportable deck/sheet/pdf for a client, month-over-month (export only)
+- **Deliverability watch**, is your sending healthy, flag a domain that's quietly burning, pause or scale (on demand or scheduled)
 - **Scale senders**, check sending capacity and buy pre-configured mailboxes/domains (simulate, then confirm)
 - **Brief**, a standing digest of what changed and what needs you (on demand, or scheduled)
 - **Run the whole loop**, "run outbound for <ICP>" does all of the above, with checkpoints
@@ -49,7 +54,7 @@ perfectly-specified command:
 
 Keep it warm and brief, offer the path, don't dump the manual. (Power users can also jump straight in
 with `/instantly-gtm-find-leads`, `-write-sequence`, `-launch-campaign`, `-triage-replies`,
-`-check-performance`, `-scale-senders`, but they never have to.)
+`-check-performance`, `-scale-senders`, `-deliverability-watch`, `-client-report`, but they never have to.)
 
 ## How this skill works (read once per session)
 
@@ -119,8 +124,10 @@ narrower ask. Keep the working state (below) so steps compose.
 | "write a sequence / cold email / follow-ups" | Step 3 |
 | "assemble / set up the campaign as a draft" | Step 4 |
 | "launch it / take it live" | Step 5 |
-| "any replies? / handle my inbox / book the meeting" | Step 6 |
-| "how's campaign X / why underperforming / deliverability" | Step 7 |
+| "any replies? / handle my inbox / book the meeting" (one reply) OR "catch me up / what came in overnight / clear my inbox / sort my replies" (whole-inbox queue) | Step 6 |
+| "how's campaign X / why underperforming / going to spam" | Step 7 |
+| "make my client report / weekly update for <client> / export the numbers for X" | Client report (`references/client-report.md`) |
+| "is my sending ok / are my domains healthy / should I pause a sender / watch my sending" | Deliverability watch (`references/deliverability-watch.md`) |
 | "give me my brief / what needs me / daily digest" | Standing brief (`references/standing-brief.md`) |
 | "set up / onboard / here's my website" | Setup phase |
 
@@ -180,6 +187,20 @@ Seven verbs are **confirm-gated**, three spend (`enrich`, `enrich_run` (credits)
 mailboxes)) and four write/act (`activate` (launch), `update_campaign`, `send_reply`, `set_interest`).
 The CLI refuses them without `--confirm`. Get an explicit in-conversation "yes", THEN run the verb with
 `--confirm`. (Spend has no auto-mode toggle, it always confirms, `dfy_place_order` included.)
+
+**Preflight the gate (don't surprise the user with a mid-flow 402).** Before a confirm-gated **spend/
+send/place**, surface any requirement you can know UP FRONT, once, contextually, with a link, so the user
+decides while they still can:
+- **Enrich (credits):** you already show the count/cost before spending (Step 1) — keep leading with
+  "this enriches ~N leads and spends ~N credits" so the cost is visible pre-confirm. (The live credit
+  balance is not queryable via the API, so state the cost, don't claim the balance.)
+- **Launch (plan/sending):** the cold-domain/health preflight already runs (guardrail 4). If the limiter
+  is the **plan's sending cap** rather than warmth, say so before the confirm and link
+  `app.instantly.ai/app/settings/billing`.
+- **DFY place (Outreach plan + payment method):** say at the SIMULATE step — before the confirm — that
+  placing needs a payment method on file, and if there isn't one they'll add it in the app. Don't let the
+  first they hear of it be the 402 at place time.
+Never transact; a link only; never repeat the nudge in a session.
 
 **Auto mode** (`node __INSTANTLY_CORE__/config.mjs get`) may skip the "yes" for a given action if its toggle is
 on (`replies`, `interest`, `campaign_edits`, `launch`), you still pass `--confirm`, but without

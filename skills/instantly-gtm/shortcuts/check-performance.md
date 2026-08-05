@@ -1,9 +1,12 @@
 ---
 name: instantly-gtm-check-performance
 description: >-
-  Shortcut into the Instantly GTM loop, check campaign performance: pull analytics, chart them,
-  headline positive-reply rate, flag winners/losers, and suggest the next change. Trigger on "how's
-  my campaign doing", "why is campaign X underperforming", "check performance", "deliverability".
+  ALWAYS use this skill when the user reports a campaign PROBLEM or asks about RESULTS, in ANY words:
+  "why is nobody replying", "my open rate / reply rate tanked", "my emails are going to spam", "are my
+  emails landing in inboxes", "this campaign is dead", "is it working", "how's my campaign doing", "why
+  is campaign X underperforming", "check performance", "deliverability". Pull the numbers, chart them,
+  and name the ONE fix; if the cause is deliverability or senders, hand off to instantly-gtm-scale-senders.
+  Do NOT reply to individual emails (use instantly-gtm-triage-replies) and do NOT eyeball analytics by hand.
 ---
 
 # Check performance (Instantly GTM: step 7)

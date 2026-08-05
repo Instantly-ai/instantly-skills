@@ -35,6 +35,10 @@
     "warmup_analytics":  { "method": "POST",  "path": "/accounts/warmup-analytics" },
     "test_vitals":       { "method": "POST",  "path": "/accounts/test/vitals" },
     "list_accounts":     { "method": "GET",   "path": "/accounts" },
+    "account_detail":    { "method": "GET",   "path": "/accounts/{email}" },
+    "account_daily":     { "method": "GET",   "path": "/accounts/analytics/daily" },
+    "account_pause":     { "method": "POST",  "path": "/accounts/{email}/pause", "confirm": true },
+    "account_resume":    { "method": "POST",  "path": "/accounts/{email}/resume", "confirm": true },
     "dfy_check_domains":       { "method": "POST", "path": "/dfy-email-account-orders/domains/check" },
     "dfy_similar_domains":     { "method": "POST", "path": "/dfy-email-account-orders/domains/similar" },
     "dfy_prewarmed_domains":   { "method": "POST", "path": "/dfy-email-account-orders/domains/pre-warmed-up-list" },
@@ -55,7 +59,7 @@
     "get_background_job":{ "method": "GET",   "path": "/background-jobs/{id}" },
     "list_background_jobs":{ "method": "GET", "path": "/background-jobs" }
   },
-  "confirm_required": ["enrich", "enrich_run", "activate", "update_campaign", "send_reply", "set_interest", "dfy_place_order"],
+  "confirm_required": ["enrich", "enrich_run", "activate", "update_campaign", "send_reply", "set_interest", "dfy_place_order", "account_pause", "account_resume"],
   "never_call": [
     "delete_campaign", "delete_account", "delete_lead", "delete_lead_list", "leads_bulk_delete",
     "email_delete", "email_forward", "email_update", "update_account", "update_lead", "update_lead_list",

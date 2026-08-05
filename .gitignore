@@ -14,6 +14,7 @@ npm-debug.log*
 
 # User runtime data (API key never lives here, but profile/config might)
 .instantly-gtm/
+docs/getting-started.md
 
 # Build-time & internal (not shipped, not public)
 CLAUDE.md
@@ -25,3 +26,4 @@ chatgpt-app-submission*.json
 
 # Dev / testing tooling (not for end users)
 reset-workspace.sh
+research/

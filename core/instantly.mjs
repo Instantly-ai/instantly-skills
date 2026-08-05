@@ -22,6 +22,9 @@ import { resolveKey } from './key.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const MAP_PATH = join(HERE, 'capability-map.json');
 const ENV_VAR = 'INSTANTLY_API_KEY';
+// Collection version, shown by `doctor` so a user can tell what they're running. Bump together with
+// CHANGELOG.md, skills/instantly-gtm/skill.json, and the `version:` in skills/instantly-gtm/SKILL.md.
+const VERSION = '1.1.0';
 // Real, invocable paths (so error hints are copy-pasteable post-install, not a stale `scripts/` guess).
 const SELF = process.argv[1] || join(HERE, 'instantly.mjs');
 const AUTH = join(HERE, 'auth.mjs');
@@ -118,6 +121,7 @@ function doctor(map) {
     if (!map.verbs[c]) problems.push(`confirm_required "${c}" is not a verb`);
     else if (!map.verbs[c].confirm) problems.push(`confirm_required "${c}" missing confirm:true`);
   }
+  process.stdout.write(`instantly-gtm ${VERSION} (see CHANGELOG.md for what changed)\n`);
   process.stdout.write(problems.length ? `map issues:\n  ${problems.join('\n  ')}\n`
     : `capability map: valid ✓ (${Object.keys(map.verbs).length} verbs, ${map.never_call.length} refused)\n`);
   // Ping the API if a key is present (same call as auth.mjs).
