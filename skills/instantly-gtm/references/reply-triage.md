@@ -100,7 +100,7 @@ next step: "this list is converting, want to find more like them?" (Step 1) or "
 One prompt, tied to a real result, never spammy.
 
 **Autopilot card (queue mode only, at a clean end-of-run):** after a completed, non-empty queue, render
-**once per session** the tasteful **AI Reply Agent** card from `references/autopilot-upsell.md` (verified
+**once per session** the tasteful **AI Reply Agent** card from `references/automation-handoff.md` (verified
 features + the create link; nudge Human-in-the-Loop as the on-brand start), plus the honest secondary
 "I can drop this queue in your chat each morning" schedule offer. Never after an empty/errored run, never
 mid-approval, never repeated. Our value stays approve-first — never imply the skill auto-sends.
