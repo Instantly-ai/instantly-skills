@@ -1,9 +1,15 @@
 ---
 name: instantly-gtm-triage-replies
 description: >-
-  Shortcut into the Instantly GTM loop, triage the inbox: classify replies, set interest status,
-  draft responses in the user's voice, and book meetings. Trigger on "any replies?", "handle my
-  inbox", "triage replies", "book the meeting".
+  ALWAYS use this skill for the INBOX and INBOUND replies, one reply OR the whole inbox: "any replies?",
+  "did anyone respond", "reply to this guy for me", "write a follow-up to this reply", "someone's
+  interested, book the call", "handle my inbox", AND the proactive whole-inbox queue / daily brief: "catch
+  me up on my inbox", "what came in overnight", "clear my inbox", "give me my morning brief", "sort my
+  replies". Classifies each reply (interested / objection-by-type / not-now / OOO / wrong-person /
+  unsubscribe / couldn't-classify), sets interest, and drafts voiced responses so you approve instead of
+  hunting tabs; can run daily on a schedule. INBOUND reply handling: for campaign analytics use
+  instantly-gtm-check-performance, for a cold sequence use instantly-gtm-write-sequence. Sending + setting
+  interest are confirm-gated; unsubscribes/complaints never get an auto-reply; it never deletes (do that in the app).
 ---
 
 # Triage replies (Instantly GTM: step 6)

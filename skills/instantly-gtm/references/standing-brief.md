@@ -8,6 +8,11 @@ build a scheduler, that's the host's job (see "Triggering").
 ## What goes in it (compose from existing reads: one shot, then back off)
 - **Replies waiting**, `count_unread` + `list_replies` (preview): "N replies waiting, M look interested,
   drafts ready for your ok." (Draft per `reply-triage.md`; do NOT send.)
+  - **Reply-queue brief (Morning Queue on a schedule):** when the user wants the full triaged inbox each
+    morning ("give me my reply queue daily", "morning inbox brief"), run `reply-triage.md`'s **proactive
+    queue mode** on the schedule, the objection-typed queue with a voiced draft per actionable thread,
+    grouped by class + a couldn't-classify bucket. Still **approve-first**: the schedule produces the queue,
+    it never sends (guardrail 2; `send_reply` stays confirm-gated). Unsub/complaint surfaced, never auto-replied.
 - **Metric movement**, `analytics_daily` / `analytics`: reply-rate holding / up / down since last brief;
   headline the positive-reply-rate north-star (`analytics.md`).
 - **Sender readiness**, `warmup_analytics` / `list_accounts`: an inbox that finished warming ("you can

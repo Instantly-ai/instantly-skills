@@ -6,25 +6,27 @@ a card/metric/chart form. This file is the single source for that vocabulary so 
 looks like one product. It is the layer over the loop; `conversation.md` sets the voice, this sets the
 shapes.
 
-## The visual is Markdown, with Mermaid for diagrams. No HTML, no artifacts.
-The visual must appear IN the chat message, on every host (including the Claude Code terminal). Two paths,
-nothing else:
-1. **Markdown (default, always).** Build the card from Markdown: a bold title + status, a small table of
-   the fields, a `▓▓▓░░` unicode bar, `- ` lists. Renders everywhere.
-2. **Mermaid** (a ` ```mermaid ` fenced block) for a funnel / flow / diagram, where the host renders it
-   inline. ALWAYS pair it with the Markdown version (a `▓▓▓░░` bar funnel), because some hosts show
-   mermaid as a code block.
+## Render IN the chat message. Inline widget where available, else Markdown + Mermaid. Never a file.
+The visual must appear inside the conversation, never in a side panel. Layered, use the highest tier the
+host offers:
+1. **Inline visual widget (best, e.g. claude.ai).** If an inline visual-widget capability exists (streams
+   an HTML/SVG fragment into the message, the `visualize:show_widget` tool after a one-time
+   `visualize:read_me`), use it for **reports** (a Chart.js chart + metric strip) and **decision cards**
+   (a card grid whose buttons call `sendPrompt(...)`). Follow `references/inline-visuals.md` for the hard
+   rules. HTML lives INSIDE the widget fragment, that's the intended path, not a file.
+2. **Markdown + Mermaid (fallback, always works).** No widget tool (API / Claude Code terminal / other
+   host) → a Markdown card (bold title + status, small table, `▓▓▓░░` bar, `- ` lists) + a ` ```mermaid `
+   funnel where the host renders it. This is the reliable floor.
 
-**Never emit HTML, and never create an artifact / published page / `.html` file for a visual** — not for
-leads, DFY, launch, capacity, a sequence draft, OR a report. Claude routes self-contained HTML (over ~15
-lines) to the side panel, the exact failure we're avoiding, and a sequence rendered as an `.html` file is
-the recurring bug. **Reports are no exception:** they render as stylized Markdown + a Mermaid funnel,
-inline. (An artifact is acceptable ONLY if the user explicitly asks for a standalone/shareable page, never
-as the default.)
+**Never create a FILE or side-panel artifact for a card** — no `.html`/`.jsx`, no artifact-creation path,
+not for leads, DFY, launch, capacity, a sequence draft, or a report. A renderable file goes to the side
+panel by design (the exact bug); a sequence rendered as an `.html` draft is the recurring one. The
+**sequence draft stays Markdown** (it's copy, not a chart/card). An artifact is acceptable ONLY when the
+user explicitly asks for a downloadable/shareable dashboard.
 
-**Confirm is always available in text.** A confirm-gated action (place order, launch, send, spend) runs
-only on an explicit **typed reply** ("place it", "launch it"). State the choices as text
-("reply place it to confirm, or edit to change"). There are no buttons, the visual is Markdown.
+**Confirm is an explicit user action.** A confirm-gated verb (place order, launch, send, spend) runs only
+after either a **`sendPrompt` button** (it sends the instruction as a user message) OR a **typed reply**
+("place it"). Always also state the typed option for no-widget hosts. A dead card is never the gate.
 
 **Never leak design internals into chat.** Do not print design plans, hex/tokens, CSS, or
 tool/framework names, and do not narrate "let me render / choosing colors". Render silently, then give a
@@ -65,10 +67,12 @@ data and never invents values to fill a card (render what's present, omit the re
 
 ## Voice inside a visual
 Same as everywhere: dry operator, sentence case, no em dashes, no "!", no emoji/dingbats (the
-`conversation.md` HARD STOP applies here too). The polish comes from clean Markdown structure, headings,
-**bold** labels, tables, a `▓▓▓░░` bar, blockquotes, not from styling.
+`conversation.md` HARD STOP applies to copy). In a Markdown card the polish is structure, headings,
+**bold** labels, tables, a `▓▓▓░░` bar. In a widget, the polish is the host CSS variables (see
+`inline-visuals.md`), never hardcoded colors.
 
-## No HTML, no CSS
-There is no styling layer. Markdown + Mermaid only. The brand shows through clear structure and plain
-labels, not colors or fonts. If you ever feel the urge to write `<div>`/`<style>` or open an artifact for
-a card, stop, that's the bug; render Markdown instead.
+## HTML belongs in a widget, never in a file
+HTML is fine INSIDE an inline visual widget (`show_widget` fragment, per `inline-visuals.md`). What's
+banned is emitting HTML **as a file / artifact** for a card, that's what side-panels it. If there's no
+widget tool, render Markdown + Mermaid, do NOT write an `.html`/`.jsx` file to compensate. Rule of thumb:
+if you're about to create a file for a visual, stop, either use the inline widget or render Markdown.

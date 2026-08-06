@@ -1,12 +1,14 @@
 ---
 name: instantly-gtm-scale-senders
 description: >-
-  Shortcut into the Instantly GTM loop, view and scale your sending infrastructure: see your sending
-  accounts and DFY orders, check if you have enough warmed mailboxes for a campaign, and buy
-  pre-configured Done-For-You mailboxes/domains from Instantly without leaving chat. Trigger on "show my
-  sending accounts / infra", "how many inboxes/mailboxes/domains do I have", "list my DFY orders", "do I
-  have enough inboxes", "I need more mailboxes/domains", "scale my sending", "my domain is cold, get me
-  more senders".
+  ALWAYS use this skill to VIEW or SCALE sending infrastructure: "do I have enough inboxes", "show my
+  sending accounts / DFY orders", "how many mailboxes/domains do I have", "I need more mailboxes/domains",
+  "get me more senders", "scale my sending", "my domain is cold, get me more senders". Checks capacity,
+  simulates a Done-For-You order, and places it only after you confirm (it never handles payment). To
+  CONNECT YOUR OWN existing mailbox, do that in the Instantly app, this skill BUYS pre-warmed senders and
+  can't connect your account. To warm a new domain: warmup runs automatically on connected/DFY accounts,
+  ask "how's my deliverability" to see warmup health. To just launch an existing campaign use
+  instantly-gtm-launch-campaign; for deliverability diagnosis start with instantly-gtm-check-performance.
 ---
 
 # Scale senders (Instantly GTM: sending infrastructure)

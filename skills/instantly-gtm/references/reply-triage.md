@@ -32,12 +32,27 @@ the user's voice, and book meetings, without ever sending silently. Verbs: `coun
   Use `disable_auto_interest` when the user wants their manual status to stick over AI re-tagging.
 - **Auto-replies** (`is_auto_reply == 1`) → OOO lane; do not draft a response unprompted.
 
+### Objection sub-type (a drafting axis on top of the status — not a new enum)
+When a reply is a brush-off or a question rather than a clean yes/no, tag WHY so the draft answers the real
+objection: **price** · **timing / not-now** · **not-the-decision-maker** · **already-have-a-tool** ·
+**send-me-info** · **too-busy**. The interest status stays as the enum above; the sub-type only picks the
+reply move (see drafting). Don't force a sub-type where there isn't one.
+
+### Couldn't-classify (never guess)
+If a reply is too short, ambiguous, or a forwarded/quoted thread you can't read confidently ("not
+interested" with no context, a one-word reply, a forward), put it in a **"you look" bucket** — do NOT
+assign a confident status or draft a confident reply. Surfacing "I couldn't call these — you read them"
+is correct; a wrong auto-classification that the operator then has to catch is worse.
+
 ## Draft the response (in the user's Reply voice)
 Match `tone.md` Reply voice; present the draft inbox-style (as the reply the prospect will read), not as
 a field dump, voice + presentation per `references/conversation.md`. Patterns by class:
 - **Interested / meeting** → propose a time using the **real booking link** from `booking-links.md`
   (never invent a URL; if none, "reply with a couple of times that work").
-- **Objection** → one honest, one-touch value answer; don't argue.
+- **Objection** → one honest, one-touch value answer tuned to the sub-type; don't argue. *Price* → anchor
+  to outcome/ROI, not a discount. *Timing/not-now* → offer a light "circle back in <N>" + a reminder_ts.
+  *Not-the-DM* → ask for the right contact (a referral, not a pitch). *Already-have-a-tool* → one specific
+  wedge vs the incumbent, then stop. *Send-me-info* → a one-line value + the booking link, not a brochure.
 - **Out of office** → optionally set a `reminder_ts` to bump when they're back; no hard sell.
 - **Wrong person** → thank them, ask for the right contact (referral).
 
@@ -51,6 +66,30 @@ NOT `thread_id`), `eaccount` = the account that RECEIVED the reply, `subject` = 
   reply is still shown (report, don't ask), and gates still stop bad items. Default OFF.
 - After handling a thread: `mark_read` on its `thread_id`.
 
+## Two modes
+- **On-demand (single reply):** "reply to this guy", "write a follow-up to this reply" → work that one
+  thread. This is the default single-message lane.
+- **Proactive queue ("Morning Queue"):** "catch me up on my inbox", "what came in overnight", "clear my
+  inbox", "give me my morning brief", "sort my replies" → work the WHOLE unread inbox as one triaged queue.
+
+### Proactive queue mode (whole inbox → one triaged queue, drafts ready)
+1. `count_unread` → is there anything to do (zero → "inbox clear").
+2. Fetch all unread with the ONE-call discipline above; paginate the cursor at 20/min for >100; filter out
+   threads we sent last.
+3. Classify each into the queue: interested · objection(sub-type) · not-now · OOO · wrong-person ·
+   unsubscribe/complaint · **couldn't-classify**. Draft a voiced, sub-type-aware reply for each actionable
+   thread (`tone.md` Reply voice).
+4. Present a QUEUE, not 60 tabs — grouped counts + a draft per hot/objection thread:
+   ```
+   12 replies — 3 hot (drafts ready), 4 objections (2 price, 1 timing, 1 not-me),
+   3 not-now, 2 OOO · 0 couldn't-classify
+   ```
+   Each hot/objection row shows its draft with **send / edit / skip**. Approve in one pass.
+5. **Nothing sends without a yes** (`send_reply`/`set_interest` stay confirm-gated / auto-toggle). Unsub /
+   complaint → surface for blocklist review, **never auto-reply**. Couldn't-classify → "you read these".
+6. Offer a **daily** version of this queue (scheduled brief) — see `standing-brief.md` — and, at a clean end,
+   the autopilot card below.
+
 ## Batch UX
 Present triage as a table (lead · campaign · class · proposed status · has-draft), process approvals
 in one pass, then send/mark per thread.
@@ -59,6 +98,12 @@ in one pass, then send/mark per thread.
 When positive replies / booked meetings appear, acknowledge the win briefly and offer the natural
 next step: "this list is converting, want to find more like them?" (Step 1) or "launch another?".
 One prompt, tied to a real result, never spammy.
+
+**Autopilot card (queue mode only, at a clean end-of-run):** after a completed, non-empty queue, render
+**once per session** the tasteful **AI Reply Agent** card from `references/automation-handoff.md` (verified
+features + the create link; nudge Human-in-the-Loop as the on-brand start), plus the honest secondary
+"I can drop this queue in your chat each morning" schedule offer. Never after an empty/errored run, never
+mid-approval, never repeated. Our value stays approve-first — never imply the skill auto-sends.
 
 ## Errors + edge cases
 - Zero unread → "inbox clear"; offer a broader scan (drop `is_unread`, time-bound it).

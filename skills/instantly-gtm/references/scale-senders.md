@@ -12,6 +12,18 @@ If the user only wants to see what they have ("show my sending accounts", "how m
 (mailboxes from those orders), and `warmup_analytics` for health when there is at least one account.
 Render a plain infra/inventory view; only move into a capacity check or an order if they ask.
 
+## 0b. Deliverability diagnosis + honest routing (read-only)
+- **Reached from check-performance** for a deliverability cause (spam / not landing / low inbox rate):
+  read `warmup_analytics` + `test_vitals` and `references/deliverability.md`, and report the sender health
+  plainly. Offer DFY pre-warmed senders **only if the senders are actually the problem** (cold/unwarmed/
+  unhealthy). If the health is fine and the issue is copy or targeting, say so and route to the sequence
+  writer, do NOT push more senders (that's the funnel-y misfire we avoid).
+- **"Connect my own mailbox / add my existing inbox":** this skill only BUYS pre-warmed DFY senders; it
+  can't connect the user's own account. Point them to the Instantly app (Settings → connect account),
+  don't steer them into a DFY purchase.
+- **"Warm up my domain":** warmup runs automatically on connected/DFY accounts; there's no manual warm
+  action here. Show warmup health (above) and, if a domain is cold, that's when new pre-warmed senders help.
+
 ## 1. Capacity check (read-only)
 - Count current senders: `list_accounts`. **If it returns zero accounts, warmed = 0, stop there, do NOT
   call `warmup_analytics`** (its body needs at least one email, so an empty call 400s). Otherwise check
@@ -55,10 +67,13 @@ Build a grounded recommendation from the persona and their §3 pre-warmed/fresh 
 - Mailbox math (from the API, don't guess): **Google / AirMail = up to 5 mailboxes per domain** (billed
   per mailbox monthly); **Microsoft/Outlook = 50 per new domain** (billed per domain monthly). So for a
   Google plan, `domains = ceil(added_mailboxes ÷ 5)`.
-Render the **simulation card** inline (per `references/visual-kit.md`, prefer inline + interactive):
+Render the **simulation card** inline (per `references/visual-kit.md` → `inline-visuals.md`: a decision
+card with a `sendPrompt` "place it" button where a widget tool exists, else Markdown + typed reply):
 domains, mailboxes, provider, new capacity, clearly marked "Simulation, not placed". Nothing is bought
 here. Always offer the choices in text too ("reply place it / edit / wait for pre-warmed"), never rely on
-a button, and never make the user open a link to act.
+a button, and never make the user open a link to act. **Preflight (say it here, before they confirm):**
+placing needs an Outreach plan + a payment method on file; if there isn't one, they'll add it in the
+Instantly app first, so a place attempt won't dead-end at a 402.
 
 ## 5. Confirm → place (the one gate)
 `dfy_place_order` is **confirm-gated and has no auto-mode** (spend always confirms, like `enrich`). Show

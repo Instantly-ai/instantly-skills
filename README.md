@@ -66,6 +66,12 @@ also learns your tone from your edits and stops re-asking what you've already de
 
 ## Install (about 60 seconds)
 
+> **Which Claude do I need?** This installs in **Claude Code** or **Claude Desktop** (they have a
+> terminal, which the install and the browser key-setup need). It does **not** install from the
+> **claude.ai website** yet — there's no terminal there. On a Mac/Windows, Claude Desktop is the
+> easiest: install it, then follow the steps below. You also need an Instantly **paid plan** (the API
+> key requires one).
+
 **Easiest — ask Claude to do it (no terminal knowledge needed).** Open Claude Code in any new folder,
 start a chat, and paste this. It'll check for Node (and install it for you if it's missing, no admin
 rights), install the skill, and walk you through your key. Approve the steps it asks about.
@@ -113,6 +119,11 @@ node ~/.instantly-gtm/core/auth.mjs disconnect        # then reconnect with: set
 
 Requires Node 18+ (don't have it? the "ask Claude" option above installs it for you via nvm, no admin
 needed), an Instantly **paid plan**, and at least one connected, warmed sending account.
+
+## Updates &amp; changelog
+Re-run the one-line installer any time to get the latest; what changed is in plain language in
+[CHANGELOG.md](CHANGELOG.md). Check your installed version with
+`node ~/.instantly-gtm/core/instantly.mjs doctor` (it prints the version on the first line).
 
 ## Structure
 - **`core/`** is the shared Instantly plumbing every skill reuses (auth, the verb-to-REST CLI, config,

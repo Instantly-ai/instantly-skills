@@ -5,6 +5,13 @@ Goal: explain how campaigns are doing, chart it, flag winners and losers, and SU
 only read verbs. Verbs: `analytics`, `analytics_overview`, `analytics_steps`, `analytics_daily`,
 `sending_status`, `list_campaigns`.
 
+**This is the front door for "why is it failing" panic phrasings** ("going to spam", "nobody's replying",
+"open rate tanked", "campaign is dead"): DIAGNOSE first from the numbers. If the drop is a **deliverability
+/ sender** problem (low inbox/open rate, sending health poor, cold domain), hand off to
+`references/scale-senders.md` (view infra → warmup health → DFY only if senders are the cause). If it's a
+**reply/copy** problem (opens fine, replies low), route to the sequence writer. Name the ONE fix; don't
+push more senders when the real problem is the copy.
+
 ## Fetch recipe (by the question asked)
 - **Portfolio / "how's everything?"** → `analytics` with no id (all campaigns) + `exclude_total_leads_count=true`
   (much faster) → a comparison table.
@@ -34,13 +41,14 @@ sent** ABOVE vanity metrics. Positive comes from `analytics_overview` (`total_in
 - Bounce < 3% is fine; **> 5% = stop and clean** the list/domains.
 - A high raw reply rate that's mostly "not interested"/"unsubscribe" is a bad sign, not a good one.
 
-## Charts (stylized Markdown + Mermaid, in the chat)
-Render the report as stylized **Markdown** in the message: a big bold hero number, a small metric table,
-and the drop-off funnel as `▓▓▓░░` bars. Use a **Mermaid** flowchart for the funnel where the host renders
-it inline, always with the Markdown bar version alongside (some hosts show mermaid as a code block).
-**Never build an HTML dashboard or an artifact for a report** (see `references/visual-kit.md`), inline
-Markdown + Mermaid only. Lead with the number that matters, then the shape, then one flat suggestion
-(voice: `conversation.md`).
+## Charts (inline widget where available, else Markdown + Mermaid)
+Render the report IN the chat. Where an inline visual-widget tool exists (claude.ai), use it: a Chart.js
+report = a metric-card strip (2–4 KPIs) + a custom legend + the reply-rate/funnel chart, per
+`references/inline-visuals.md` (CSS-variable theming, Instantly hex dataset colors, one y-axis, aria).
+Otherwise fall back to stylized **Markdown** (bold hero number, metric table, `▓▓▓░░` funnel bars) + a
+**Mermaid** funnel where it renders. **Never build a file / HTML dashboard / artifact for a report**
+(that side-panels it), inline widget or Markdown only. Lead with the number that matters, then the shape,
+then one flat suggestion (voice: `conversation.md`).
 
 **The report layout (in this order):**
 1. **Hero, positive-reply rate.** The north-star as one large number + a small trend sparkline
